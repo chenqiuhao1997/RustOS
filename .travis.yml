@@ -31,6 +31,4 @@ before_script:
 
 script:
   - cd kernel && make build arch=$ARCH smp=1
-
-test:
   - python test/test.py
