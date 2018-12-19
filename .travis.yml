@@ -27,5 +27,4 @@ before_script:
   - export PATH=$PATH:$PWD/qemu-3.1.0/riscv32-softmmu
 
 script:
-  - (cd kernel && make run)
   - python test/test.py
