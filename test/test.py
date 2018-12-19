@@ -94,7 +94,7 @@ checklist = {
 unit_test = ['/crate/process', '/crate/memory']
 
 realpath = sys.path[0]
-#os.system(realpath+'/clean_and_make.sh')
+os.system(realpath+'/clean_and_make.sh')
 for unit_test_path in unit_test:
 	if os.system('cd '+realpath+' && cd ..'+unit_test_path+' && cargo test'):
 		print("unit test "+unit_test_path+" error")
@@ -131,4 +131,5 @@ for testcase in checklist.keys():
 	else:
 		print(testcase+": ERROR")
 		print(res)
+		sys.exit(3)
 
