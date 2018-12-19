@@ -1,6 +1,6 @@
 # RustOS
 
-[![Build Status](https://travis-ci.org/wangrunji0408/RustOS.svg?branch=master)](https://travis-ci.org/wangrunji0408/RustOS)
+[![Build Status](https://travis-ci.com/chenqiuhao1997/RustOS.svg?branch=master)](https://travis-ci.com/chenqiuhao1997/RustOS)
 
 Rust port for uCore OS, supporting x86_64 and riscv32i.
 
