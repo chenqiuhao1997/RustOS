@@ -36,11 +36,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bit-vec"
-version = "0.5.0"
-source = "git+https://github.com/AltSysrq/bit-vec.git#9861a58d6e761906cc63964c759e71f05bf63540"
-
-[[package]]
 name = "bit_field"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -219,16 +214,6 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "simple-filesystem"
-version = "0.0.1"
-source = "git+https://github.com/wangrunji0408/SimpleFileSystem-Rust?branch=multi-thread#24a51faff266744d83c1ef60328b28906d2b525c"
-dependencies = [
- "bit-vec 0.5.0 (git+https://github.com/AltSysrq/bit-vec.git)",
- "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "static_assertions 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "skeptic"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -240,11 +225,6 @@ dependencies = [
 [[package]]
 name = "spin"
 version = "0.4.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "static_assertions"
-version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -283,11 +263,9 @@ dependencies = [
  "raw-cpuid 6.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "redox_syscall 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "riscv 0.3.0 (git+https://github.com/riscv-and-rust-and-decaf/riscv)",
- "simple-filesystem 0.0.1 (git+https://github.com/wangrunji0408/SimpleFileSystem-Rust?branch=multi-thread)",
  "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "uart_16550 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ucore-memory 0.1.0",
- "ucore-process 0.1.0",
  "volatile 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "x86_64 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "xmas-elf 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -295,14 +273,6 @@ dependencies = [
 
 [[package]]
 name = "ucore-memory"
-version = "0.1.0"
-dependencies = [
- "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "ucore-process"
 version = "0.1.0"
 dependencies = [
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -399,7 +369,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum apic 0.1.0 (git+https://github.com/wangrunji0408/APIC-Rust)" = "<none>"
 "checksum array-init 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "23589ecb866b460d3a0f1278834750268c607e8e28a1b982c907219f3178cd72"
 "checksum bare-metal 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "a3caf393d93b2d453e80638d0674597020cef3382ada454faacd43d1a55a735a"
-"checksum bit-vec 0.5.0 (git+https://github.com/AltSysrq/bit-vec.git)" = "<none>"
 "checksum bit_field 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ed8765909f9009617974ab6b7d332625b320b33c326b1e9321382ef1999b5d56"
 "checksum bitflags 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "228047a76f468627ca71776ecdebd732a3423081fcf5125585bcd7c49886ce12"
 "checksum bootloader 0.3.4 (git+https://github.com/wangrunji0408/bootloader)" = "<none>"
@@ -425,10 +394,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum rustc_version 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 "checksum semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
-"checksum simple-filesystem 0.0.1 (git+https://github.com/wangrunji0408/SimpleFileSystem-Rust?branch=multi-thread)" = "<none>"
 "checksum skeptic 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "061203a849117b0f7090baf8157aa91dac30545208fbb85166ac58b4ca33d89c"
 "checksum spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ceac490aa12c567115b40b7b7fceca03a6c9d53d5defea066123debc83c5dc1f"
-"checksum static_assertions 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "c19be23126415861cb3a23e501d34a708f7f9b2183c5252d690941c2e69199d5"
 "checksum tempdir 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "15f2b5fb00ccdf689e0149d1b1b3c03fead81c2b37735d812fa8bddbbf41b6d8"
 "checksum uart_16550 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "269f953d8de3226f7c065c589c7b4a3e83d10a419c7c3b5e2e0f197e6acc966e"
 "checksum unicode-width 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "882386231c45df4700b275c7ff55b6f3698780a650026380e72dabe76fa46526"

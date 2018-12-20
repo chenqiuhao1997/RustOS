@@ -2,9 +2,7 @@
 
 use arch::interrupt::TrapFrame;
 use process::*;
-use thread;
 use util;
-use simple_filesystem::{INode, file::File, FileInfo, FileType};
 use core::{slice, str};
 use alloc::sync::Arc;
 use spin::Mutex;
@@ -58,205 +56,72 @@ pub fn syscall(id: usize, args: [usize; 6], tf: &mut TrapFrame) -> i32 {
 }
 
 fn sys_read(fd: usize, base: *mut u8, len: usize) -> SysResult {
-    // TODO: check ptr
-    info!("read: fd: {}, base: {:?}, len: {:#x}", fd, base, len);
-    let slice = unsafe { slice::from_raw_parts_mut(base, len) };
-    let len = get_file(fd)?.lock().read(slice)?;
-    Ok(len as i32)
+    unimplemented!()
 }
 
 fn sys_write(fd: usize, base: *const u8, len: usize) -> SysResult {
-    // TODO: check ptr
-    info!("write: fd: {}, base: {:?}, len: {:#x}", fd, base, len);
-    let slice = unsafe { slice::from_raw_parts(base, len) };
-    let len = get_file(fd)?.lock().write(slice)?;
-    Ok(len as i32)
+    unimplemented!()
 }
 
 fn sys_open(path: *const u8, flags: usize) -> SysResult {
-    // TODO: check ptr
-    let path = unsafe { util::from_cstr(path) };
-    let flags = VfsFlags::from_ucore_flags(flags);
-    info!("open: path: {:?}, flags: {:?}", path, flags);
-    let (fd, inode) = match path {
-        "stdin:" => (0, ::fs::STDIN.clone() as Arc<INode>),
-        "stdout:" => (1, ::fs::STDOUT.clone() as Arc<INode>),
-        _ => {
-            let fd = (3..).find(|i| !process().files.contains_key(i)).unwrap();
-            let inode = ::fs::ROOT_INODE.lookup(path)?;
-            (fd, inode)
-        }
-    };
-    let file = File::new(inode, flags.contains(VfsFlags::READABLE), flags.contains(VfsFlags::WRITABLE));
-    process().files.insert(fd, Arc::new(Mutex::new(file)));
-    Ok(fd as i32)
+    unimplemented!()
 }
 
 fn sys_close(fd: usize) -> SysResult {
-    info!("close: fd: {:?}", fd);
-    match process().files.remove(&fd) {
-        Some(_) => Ok(0),
-        None => Err(SysError::InvalidFile),
-    }
+    unimplemented!()
 }
 
 fn sys_fstat(fd: usize, stat_ptr: *mut Stat) -> SysResult {
-    // TODO: check ptr
-    info!("fstat: {}", fd);
-    let file = get_file(fd)?;
-    let stat = Stat::from(file.lock().info()?);
-    unsafe { stat_ptr.write(stat); }
-    Ok(0)
+    unimplemented!()
 }
 
 /// entry_id = dentry.offset / 256
 /// dentry.name = entry_name
 /// dentry.offset += 256
 fn sys_getdirentry(fd: usize, dentry_ptr: *mut DirEntry) -> SysResult {
-    // TODO: check ptr
-    info!("getdirentry: {}", fd);
-    let file = get_file(fd)?;
-    let dentry = unsafe { &mut *dentry_ptr };
-    if !dentry.check() {
-        return Err(SysError::InvalidArgument);
-    }
-    let info = file.lock().info()?;
-    if info.type_ != FileType::Dir || info.size <= dentry.entry_id() {
-        return Err(SysError::InvalidArgument);
-    }
-    let name = file.lock().get_entry(dentry.entry_id())?;
-    dentry.set_name(name.as_str());
-    Ok(0)
+    unimplemented!()
 }
 
 fn sys_dup(fd1: usize, fd2: usize) -> SysResult {
-    info!("dup: {} {}", fd1, fd2);
-    let file = get_file(fd1)?;
-    if process().files.contains_key(&fd2) {
-        return Err(SysError::InvalidFile);
-    }
-    process().files.insert(fd2, file.clone());
-    Ok(0)
+    unimplemented!()
 }
 
 /// Fork the current process. Return the child's PID.
 fn sys_fork(tf: &TrapFrame) -> SysResult {
-    let mut context = process().fork(tf);
-    let pid = processor().manager().add(context, thread::current().id());
-    info!("fork: {} -> {}", thread::current().id(), pid);
-    Ok(pid as i32)
+    unimplemented!()
 }
 
 /// Wait the process exit.
 /// Return the PID. Store exit code to `code` if it's not null.
 fn sys_wait(pid: usize, code: *mut i32) -> SysResult {
-    // TODO: check ptr
-    loop {
-        let wait_procs = match pid {
-            0 => processor().manager().get_children(thread::current().id()),
-            _ => vec![pid],
-        };
-        if wait_procs.is_empty() {
-            return Ok(-1);
-        }
-        for pid in wait_procs {
-            match processor().manager().get_status(pid) {
-                Some(Status::Exited(exit_code)) => {
-                    if !code.is_null() {
-                        unsafe { code.write(exit_code as i32); }
-                    }
-                    processor().manager().remove(pid);
-                    info!("wait: {} -> {}", thread::current().id(), pid);
-                    return Ok(0);
-                }
-                None => return Ok(-1),
-                _ => {}
-            }
-        }
-        info!("wait: {} -> {}, sleep", thread::current().id(), pid);
-        if pid == 0 {
-            processor().manager().wait_child(thread::current().id());
-            processor().yield_now();
-        } else {
-            processor().manager().wait(thread::current().id(), pid);
-            processor().yield_now();
-        }
-    }
+    unimplemented!()
 }
 
 fn sys_exec(name: *const u8, argc: usize, argv: *const *const u8, tf: &mut TrapFrame) -> SysResult {
-    // TODO: check ptr
-    let name = if name.is_null() { "" } else { unsafe { util::from_cstr(name) } };
-    info!("exec: {:?}, argc: {}, argv: {:?}", name, argc, argv);
-    // Copy args to kernel
-    let args: Vec<String> = unsafe {
-        slice::from_raw_parts(argv, argc).iter()
-            .map(|&arg| String::from(util::from_cstr(arg)))
-            .collect()
-    };
-
-    // Read program file
-    let path = args[0].as_str();
-    let inode = ::fs::ROOT_INODE.lookup(path)?;
-    let size = inode.info()?.size;
-    let mut buf = Vec::with_capacity(size);
-    unsafe { buf.set_len(size); }
-    inode.read_at(0, buf.as_mut_slice())?;
-
-    // Make new Context
-    let iter = args.iter().map(|s| s.as_str());
-    let mut context = ContextImpl::new_user(buf.as_slice(), iter);
-
-    // Activate new page table
-    unsafe { context.memory_set.activate(); }
-
-    // Modify the TrapFrame
-    *tf = unsafe { context.arch.get_init_tf() };
-
-    // Swap Context but keep KStack
-    ::core::mem::swap(&mut process().kstack, &mut context.kstack);
-    ::core::mem::swap(process(), &mut *context);
-
-    Ok(0)
+    unimplemented!()
 }
 
 fn sys_yield() -> SysResult {
-    thread::yield_now();
-    Ok(0)
+    unimplemented!()
 }
 
 /// Kill the process
 fn sys_kill(pid: usize) -> SysResult {
-    info!("{} killed: {}", thread::current().id(), pid);
-    processor().manager().exit(pid, 0x100);
-    if pid == thread::current().id() {
-        processor().yield_now();
-    }
-    Ok(0)
+    unimplemented!()
 }
 
 /// Get the current process id
 fn sys_getpid() -> SysResult {
-    Ok(thread::current().id() as i32)
+    unimplemented!()
 }
 
 /// Exit the current process
 fn sys_exit(exit_code: i32) -> SysResult {
-    let pid = thread::current().id();
-    info!("exit: {}, code: {}", pid, exit_code);
-    processor().manager().exit(pid, exit_code as usize);
-    processor().yield_now();
-    unreachable!();
+    unimplemented!()
 }
 
 fn sys_sleep(time: usize) -> SysResult {
-    if time >= 1 << 31 {
-        thread::park();
-    } else {
-        use core::time::Duration;
-        thread::sleep(Duration::from_millis(time as u64 * 10));
-    }
-    Ok(0)
+    unimplemented!()
 }
 
 fn sys_get_time() -> SysResult {
@@ -264,19 +129,13 @@ fn sys_get_time() -> SysResult {
 }
 
 fn sys_lab6_set_priority(priority: usize) -> SysResult {
-    let pid = thread::current().id();
-    processor().manager().set_priority(pid, priority as u8);
-    Ok(0)
+    unimplemented!()
 }
 
 fn sys_putc(c: char) -> SysResult {
-    print!("{}", c);
-    Ok(0)
+    unimplemented!()
 }
 
-fn get_file(fd: usize) -> Result<&'static Arc<Mutex<File>>, SysError> {
-    process().files.get(&fd).ok_or(SysError::InvalidFile)
-}
 
 pub type SysResult = Result<i32, SysError>;
 
@@ -361,20 +220,5 @@ bitflags! {
         const CHAR  = 0o40000;
         /// block device
         const BLOCK = 0o50000;
-    }
-}
-
-impl From<FileInfo> for Stat {
-    fn from(info: FileInfo) -> Self {
-        Stat {
-            mode: match info.type_ {
-                FileType::File => StatMode::FILE,
-                FileType::Dir => StatMode::DIR,
-                _ => StatMode::NULL,
-            },
-            nlinks: info.nlinks as u32,
-            blocks: info.blocks as u32,
-            size: info.size as u32,
-        }
     }
 }

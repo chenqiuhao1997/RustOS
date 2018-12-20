@@ -27,17 +27,13 @@ extern crate linked_list_allocator;
 extern crate log;
 #[macro_use]
 extern crate once;
-extern crate simple_filesystem;
 extern crate spin;
 extern crate ucore_memory;
-extern crate ucore_process;
 extern crate volatile;
 #[cfg(target_arch = "x86_64")]
 extern crate x86_64;
 extern crate xmas_elf;
 
-pub use process::{processor, new_kernel_context};
-use ucore_process::thread;
 use linked_list_allocator::LockedHeap;
 
 #[macro_use]    // print!
@@ -49,22 +45,14 @@ mod consts;
 mod process;
 mod syscall;
 mod fs;
-mod sync;
 mod trap;
-mod shell;
-
-#[allow(dead_code)]
-#[cfg(target_arch = "x86_64")]
-#[path = "arch/x86_64/mod.rs"]
-pub mod arch;
 
 #[cfg(target_arch = "riscv32")]
 #[path = "arch/riscv32/mod.rs"]
 pub mod arch;
 
 pub fn kmain() -> ! {
-    process::processor().run();
-
+	loop {}
 //    thread::test::local_key();
 //    thread::test::unpack();
 //    sync::test::philosopher_using_mutex();

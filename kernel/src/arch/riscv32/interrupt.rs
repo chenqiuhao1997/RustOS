@@ -206,3 +206,10 @@ fn emulate_mul_div(tf: &mut TrapFrame) -> bool {
     const MATCH_REMU: usize = 0x2007033;
     const MASK_REMU: usize = 0xfe00707f;
 }
+
+#[inline(always)]
+#[cfg(target_arch = "riscv32")]
+pub unsafe fn restore_now(flags: usize) {
+    debug!("interrupt restore {:x}", flags);
+    asm!("csrs 0x100, $0" :: "r"(flags));
+}

@@ -8,17 +8,11 @@ pub fn timer() {
     if cpu::id() == 0 {
         unsafe { TICK += 1; }
     }
-    processor().tick();
+    println!("ticks {:?}", TICK);
 }
 
 pub fn error(tf: &TrapFrame) -> ! {
-    error!("{:#x?}", tf);
-    let pid = processor().pid();
-    error!("On CPU{} Process {}", cpu::id(), pid);
-
-    processor().manager().exit(pid, 0x100);
-    processor().yield_now();
-    unreachable!();
+    unimplemented!()
 }
 
 pub fn serial(c: char) {
