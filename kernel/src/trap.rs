@@ -1,4 +1,3 @@
-use process::*;
 use arch::interrupt::TrapFrame;
 use arch::cpu;
 
@@ -8,7 +7,7 @@ pub fn timer() {
     if cpu::id() == 0 {
         unsafe { TICK += 1; }
     }
-    println!("ticks {:?}", TICK);
+    unsafe{  println!("ticks {:?}", TICK);}
 }
 
 pub fn error(tf: &TrapFrame) -> ! {

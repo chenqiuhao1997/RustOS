@@ -1,7 +1,6 @@
 //! System call
 
 use arch::interrupt::TrapFrame;
-use process::*;
 use util;
 use core::{slice, str};
 use alloc::sync::Arc;

@@ -39,7 +39,7 @@ fn init_frame_allocator() {
     use core::ops::Range;
     use consts::{MEMORY_OFFSET, MEMORY_END};
 
-    let mut ba = FRAME_ALLOCATOR;
+    let mut ba = FRAME_ALLOCATOR.lock();
     ba.insert(to_range(end as usize + PAGE_SIZE, MEMORY_END));
     info!("FrameAllocator init end");
 

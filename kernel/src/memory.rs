@@ -7,7 +7,6 @@ use ucore_memory::{*, paging::PageTable};
 use ucore_memory::cow::CowExt;
 pub use ucore_memory::memory_set::{MemoryArea, MemoryAttr, MemorySet as MemorySet_, InactivePageTable, MemoryHandler};
 use ucore_memory::swap::{fifo, mock_swapper, SwapExt as SwapExt_};
-use process::{process};
 use alloc::vec::Vec;
 use alloc::sync::Arc;
 use alloc::boxed::Box;
@@ -24,6 +23,7 @@ pub type FrameAlloc = BitAlloc64K;
 #[cfg(target_arch = "riscv32")]
 pub type FrameAlloc = BitAlloc4K;
 
+/*
 lazy_static! {
     pub static ref FRAME_ALLOCATOR: FrameAlloc = FrameAlloc::default();
 }
@@ -57,6 +57,45 @@ lazy_static!{
 pub fn cow_table() -> CowExt{
     *COW_TABLE.as_ref()
 }
+*/
+
+lazy_static! {
+    pub static ref FRAME_ALLOCATOR: spin::Mutex<FrameAlloc> = spin::Mutex::new(FrameAlloc::default());
+}
+
+lazy_static! {
+    pub static ref ACTIVE_TABLE: spin::Mutex<ActivePageTable> = spin::Mutex::new(unsafe {
+        ActivePageTable::new()
+    });
+}
+
+/// The only way to get active page table
+//pub fn active_table() -> spin::MutexGuard<'static, ActivePageTable> {
+//    ACTIVE_TABLE.lock()
+//}
+
+pub fn active_table() -> ActivePageTable{
+    unsafe{ActivePageTable::new()}
+}
+
+lazy_static!{
+    pub static ref SWAP_TABLE: Arc<spin::Mutex<SwapExtType>> = 
+        Arc::new(spin::Mutex::new(SwapExtType::new(fifo::FifoSwapManager::default(), mock_swapper::MockSwapper::default())));
+}
+
+pub fn swap_table() -> spin::MutexGuard<'static, SwapExtType>{
+    SWAP_TABLE.lock()
+}
+
+
+lazy_static!{
+    pub static ref COW_TABLE: Arc<spin::Mutex<CowExt>> = 
+        Arc::new(spin::Mutex::new(CowExt::new()));
+}
+
+pub fn cow_table() -> spin::MutexGuard<'static, CowExt>{
+    COW_TABLE.lock()
+}
 
 /*
 * @brief:
@@ -66,7 +105,7 @@ pub fn cow_table() -> CowExt{
 */
 pub fn alloc_frame() -> Option<usize> {
     // get the real address of the alloc frame
-    let ret = FRAME_ALLOCATOR.alloc().map(|id| id * PAGE_SIZE + MEMORY_OFFSET);
+    let ret = FRAME_ALLOCATOR.lock().alloc().map(|id| id * PAGE_SIZE + MEMORY_OFFSET);
     trace!("Allocate frame: {:x?}", ret);
     //do we need : unsafe { ACTIVE_TABLE_SWAP.force_unlock(); } ???
     Some(ret.unwrap_or_else(|| {
@@ -80,7 +119,7 @@ pub fn alloc_frame() -> Option<usize> {
 
 pub fn dealloc_frame(target: usize) {
     trace!("Deallocate frame: {:x}", target);
-    FRAME_ALLOCATOR.dealloc((target - MEMORY_OFFSET) / PAGE_SIZE);
+    FRAME_ALLOCATOR.lock().dealloc((target - MEMORY_OFFSET) / PAGE_SIZE);
 }
 
 pub struct KernelStack(usize);
@@ -114,6 +153,7 @@ impl Drop for KernelStack {
 *   Return true to continue, false to halt
 */
 pub fn page_fault_handler(addr: usize) -> bool {
+    /*
     info!("start handling swap in/out page fault");
     //unsafe { ACTIVE_TABLE_SWAP.force_unlock(); }
     
@@ -135,6 +175,7 @@ pub fn page_fault_handler(addr: usize) -> bool {
             return false;
         },
     };
+    */
     false
 }
 
@@ -263,7 +304,7 @@ impl NormalMemoryHandler{
         }
     }
 }
-
+/*
 pub struct SwapMemoryHandler{
     swap_ext: Arc<SwapExtType>,
     flags: MemoryAttr,
@@ -522,3 +563,4 @@ impl Clone for CowMemoryHandler{
         CowMemoryHandler::new(self.cow_ext.clone(), self.flags.clone())
     }
 }
+*/

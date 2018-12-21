@@ -42,7 +42,6 @@ mod memory;
 mod lang;
 mod util;
 mod consts;
-mod process;
 mod syscall;
 mod fs;
 mod trap;
@@ -53,11 +52,6 @@ pub mod arch;
 
 pub fn kmain() -> ! {
 	loop {}
-//    thread::test::local_key();
-//    thread::test::unpack();
-//    sync::test::philosopher_using_mutex();
-//    sync::test::philosopher_using_monitor();
-//    sync::mpsc::test::test_all();
 }
 
 /// Global heap allocator

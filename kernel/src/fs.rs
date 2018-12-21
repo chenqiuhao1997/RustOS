@@ -6,6 +6,7 @@ use core::slice;
 
 use ::memory::{InactivePageTable0};
 use memory::MemorySet;
+use spin::Mutex;
 //use process::context::memory_set_map_swappable;
 
 // Hard link user program
@@ -22,16 +23,16 @@ _user_img_end:
 
 #[derive(Default)]
 pub struct Stdin {
-    buf: VecDeque<char>,
+    buf: Mutex<VecDeque<char>>,
 }
 
 impl Stdin {
     pub fn push(&self, c: char) {
-        self.buf.push_back(c);
+        self.buf.lock().push_back(c);
     }
     pub fn pop(&self) -> char {
         loop {
-            let ret = self.buf.pop_front();
+            let ret = self.buf.lock().pop_front();
             match ret {
                 Some(c) => return c,
                 None => {},
