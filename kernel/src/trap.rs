@@ -7,7 +7,7 @@ pub fn timer() {
     if cpu::id() == 0 {
         unsafe { TICK += 1; }
     }
-    unsafe{  println!("ticks {:?}", TICK);}
+    unsafe{  if (TICK & 63)==0 {println!("ticks 0x{tick:08x}", tick=TICK);}}
 }
 
 pub fn error(tf: &TrapFrame) -> ! {
