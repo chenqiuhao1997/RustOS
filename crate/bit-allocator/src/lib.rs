@@ -123,16 +123,7 @@ impl BitAlloc for BitAlloc16 {
 }
 
 #[inline(always)]
-#[cfg(target_arch = "x86_64")]
-fn log2(x: u16) -> usize {
-    assert_ne!(x, 0);
-    let pos: u16;
-    unsafe { asm!("bsrw $1, $0" :"=r"(pos) :"r"(x) : :"volatile") };
-    pos as usize
-}
-
-#[inline(always)]
-#[cfg(not(target_arch = "x86_64"))]
+#[cfg(target_arch = "riscv32")]
 fn log2(x: u16) -> usize {
     log2_naive(x)
 }

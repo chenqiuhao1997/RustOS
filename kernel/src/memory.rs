@@ -16,10 +16,6 @@ use core::slice;
 pub type MemorySet = MemorySet_<InactivePageTable0>;
 pub type SwapExtType = SwapExt_<fifo::FifoSwapManager, mock_swapper::MockSwapper, InactivePageTable0>;
 
-// x86_64 support up to 256M memory
-#[cfg(target_arch = "x86_64")]
-pub type FrameAlloc = BitAlloc64K;
-
 // RISCV only have 8M memory
 #[cfg(target_arch = "riscv32")]
 pub type FrameAlloc = BitAlloc4K;

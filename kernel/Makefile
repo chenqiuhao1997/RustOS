@@ -8,7 +8,7 @@
 # 	make clean					Clean
 #
 # Options:
-#   arch = x86_64 | riscv32
+#   arch = riscv32
 #   d    = int | in_asm | ...	QEMU debug info
 #   mode = debug | release
 #   LOG  = off | error | warn | info | debug | trace
@@ -29,14 +29,7 @@ user_bin_path := ../user/target/$(arch)-ucore/debug
 user_bins := $(patsubst $(user_bin_path)/%.d, $(user_bin_path)/%, $(wildcard $(user_bin_path)/*.d))
 user_obj := build/$(arch)/user.o
 SFSIMG := ../user/ucore32.img
-ifeq ($(arch), x86_64)
-qemu_opts := \
-	-drive format=raw,file=$(bootimage) \
-	-drive format=raw,file=$(SFSIMG),media=disk,cache=writeback \
-	-smp cores=$(smp) \
-	-serial mon:stdio \
-	-device isa-debug-exit
-endif
+
 ifeq ($(arch), riscv32)
 qemu_opts := \
 	-machine virt \
@@ -72,7 +65,7 @@ uname := $(shell uname)
 endif
 
 ifeq ($(uname), Darwin)
-prefix := x86_64-elf-
+prefix := riscv64-unknown-elf-
 endif
 ifeq ($(arch), riscv32)
 prefix := riscv64-unknown-elf-
@@ -102,9 +95,7 @@ justrun:
 debug: $(bin)
 	@qemu-system-$(arch) $(qemu_opts) -s -S &
 
-ifeq ($(arch), x86_64)
-build: kernel
-else
+ifeq ($(arch), riscv32)
 build: $(bin)
 endif
 
@@ -135,9 +126,7 @@ else
 endif
 
 kernel:
-ifeq ($(arch), x86_64)
-	@bootimage build $(build_args)
-else
+ifeq ($(arch), riscv32)
 	@-patch -p0 -N -b \
 		$(shell rustc --print sysroot)/lib/rustlib/src/rust/src/libcore/sync/atomic.rs \
 		src/arch/riscv32/atomic.patch

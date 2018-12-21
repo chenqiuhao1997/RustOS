@@ -30,8 +30,6 @@ extern crate once;
 extern crate spin;
 extern crate ucore_memory;
 extern crate volatile;
-#[cfg(target_arch = "x86_64")]
-extern crate x86_64;
 extern crate xmas_elf;
 
 use linked_list_allocator::LockedHeap;

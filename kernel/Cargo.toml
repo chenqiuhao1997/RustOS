@@ -27,33 +27,14 @@ lazy_static = { version = "1.2", features = ["spin_no_std"] }
 bit-allocator = { path = "../crate/bit-allocator" }
 ucore-memory = { path = "../crate/memory" }
 
-[target.'cfg(target_arch = "x86_64")'.dependencies]
-bootloader = { git = "https://github.com/wangrunji0408/bootloader" }
-apic = { git = "https://github.com/wangrunji0408/APIC-Rust" }
-#bootloader = { path = "../crate/bootloader" }
-#apic = { path = "../crate/apic" }
-x86_64 = "0.3"
-raw-cpuid = "6.0"
-redox_syscall = "0.1"
-uart_16550 = "0.1"
-
 [target.'cfg(target_arch = "riscv32")'.dependencies]
 riscv = { git = "https://github.com/riscv-and-rust-and-decaf/riscv" }
 bbl = { path = "../crate/bbl" }
 
 [package.metadata.bootimage]
-default-target = "x86_64-blog_os.json"
-output = "target/x86_64-blog_os/bootimage.bin"
 minimum-image-size = 0      # The minimum output file size (in MiB)
 # The command invoked on `bootimage run`
 # (the "{}" will be replaced with the path to the bootable disk image)
-run-command = ["qemu-system-x86_64",
-    "-drive", "format=raw,file={}",
-    "-drive", "format=raw,file=../user/ucore32.img,media=disk,cache=writeback",
-    "-serial", "mon:stdio",
-    "-device", "isa-debug-exit",
-    "-smp", "4"
-]
 
 [build-dependencies]
 cc = "1.0"

@@ -1,6 +1,4 @@
 use alloc::{boxed::Box, sync::Arc, string::String, collections::VecDeque, vec::Vec};
-#[cfg(target_arch = "x86_64")]
-use arch::driver::ide;
 use core::any::Any;
 use core::slice;
 
