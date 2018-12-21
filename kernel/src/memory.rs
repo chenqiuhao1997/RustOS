@@ -7,6 +7,7 @@ use ucore_memory::{*, paging::PageTable};
 use ucore_memory::cow::CowExt;
 pub use ucore_memory::memory_set::{MemoryArea, MemoryAttr, MemorySet as MemorySet_, InactivePageTable, MemoryHandler};
 use ucore_memory::swap::{fifo, mock_swapper, SwapExt as SwapExt_};
+use sync::{SpinNoIrqLock, SpinNoIrq, MutexGuard};
 use alloc::vec::Vec;
 use alloc::sync::Arc;
 use alloc::boxed::Box;
@@ -23,59 +24,20 @@ pub type FrameAlloc = BitAlloc64K;
 #[cfg(target_arch = "riscv32")]
 pub type FrameAlloc = BitAlloc4K;
 
-/*
-lazy_static! {
-    pub static ref FRAME_ALLOCATOR: FrameAlloc = FrameAlloc::default();
-}
 
 lazy_static! {
-    static ref ACTIVE_TABLE: ActivePageTable = unsafe {
-        ActivePageTable::new()
-    };
-}
-
-/// The only way to get active page table
-pub fn active_table() -> ActivePageTable {
-    *ACTIVE_TABLE
-}
-
-lazy_static!{
-    pub static ref SWAP_TABLE: Arc<SwapExtType> = 
-        Arc::new(SwapExtType::new(fifo::FifoSwapManager::default(), mock_swapper::MockSwapper::default()));
-}
-
-pub fn swap_table() -> SwapExtType{
-    *SWAP_TABLE.as_ref()
-}
-
-
-lazy_static!{
-    pub static ref COW_TABLE: Arc<CowExt> = 
-        Arc::new(CowExt::new());
-}
-
-pub fn cow_table() -> CowExt{
-    *COW_TABLE.as_ref()
-}
-*/
-
-lazy_static! {
-    pub static ref FRAME_ALLOCATOR: spin::Mutex<FrameAlloc> = spin::Mutex::new(FrameAlloc::default());
+    pub static ref FRAME_ALLOCATOR: SpinNoIrqLock<FrameAlloc> = SpinNoIrqLock::new(FrameAlloc::default());
 }
 
 lazy_static! {
-    pub static ref ACTIVE_TABLE: spin::Mutex<ActivePageTable> = spin::Mutex::new(unsafe {
+    static ref ACTIVE_TABLE: SpinNoIrqLock<ActivePageTable> = SpinNoIrqLock::new(unsafe {
         ActivePageTable::new()
     });
 }
 
 /// The only way to get active page table
-//pub fn active_table() -> spin::MutexGuard<'static, ActivePageTable> {
-//    ACTIVE_TABLE.lock()
-//}
-
-pub fn active_table() -> ActivePageTable{
-    unsafe{ActivePageTable::new()}
+pub fn active_table() -> MutexGuard<'static, ActivePageTable, SpinNoIrq> {
+    ACTIVE_TABLE.lock()
 }
 
 lazy_static!{
@@ -113,7 +75,7 @@ pub fn alloc_frame() -> Option<usize> {
         // we get pagetable before we get the swap table lock
         // otherwise we may run into dead lock
         let mut temp_table = active_table();
-        swap_table().swap_out_any(&mut temp_table).ok().expect("fail to swap out page")
+        swap_table().swap_out_any(temp_table.get_data_mut()).ok().expect("fail to swap out page")
     }))
 }
 
@@ -153,29 +115,7 @@ impl Drop for KernelStack {
 *   Return true to continue, false to halt
 */
 pub fn page_fault_handler(addr: usize) -> bool {
-    /*
-    info!("start handling swap in/out page fault");
-    //unsafe { ACTIVE_TABLE_SWAP.force_unlock(); }
-    
-    info!("active page table token in pg fault is {:x?}, virtaddr is {:x?}", ActivePageTable::token(), addr);
-    info!("get pt from process()");
-    let target_area = process().get_memory_set_mut().find_area(addr);
-    match target_area{
-        Some(area) => {
-            let pt = process().get_memory_set_mut().get_page_table_mut();
-            let mut temp_table = active_table();
-            if area.page_fault_handler(&mut temp_table, pt as *mut InactivePageTable0 as usize, addr) {
-                return true;
-            }
-            //if swap_table().page_fault_handler(temp_table.get_data_mut(), pt as *mut InactivePageTable0, addr, true, || alloc_frame().expect("fail to alloc frame")){
-            //    return true;
-            //}
-        },
-        None => {
-            return false;
-        },
-    };
-    */
+    //since we don't have any process now, we don't need handle the page fault
     false
 }
 
@@ -304,9 +244,9 @@ impl NormalMemoryHandler{
         }
     }
 }
-/*
+
 pub struct SwapMemoryHandler{
-    swap_ext: Arc<SwapExtType>,
+    swap_ext: Arc<spin::Mutex<SwapExtType>>,
     flags: MemoryAttr,
     delay_alloc: Vec<VirtAddr>,
 }
@@ -333,14 +273,14 @@ impl MemoryHandler for SwapMemoryHandler{
             info!("no delay allocated addr: {:x?}", addr);
             let target = InactivePageTable0::alloc_frame().expect("failed to allocate frame");
             self.flags.apply(pt.map(addr, target));
-            unsafe{self.swap_ext.set_swappable(pt, inpt as *mut InactivePageTable0, addr);}
+            unsafe{self.swap_ext.lock().set_swappable(pt, inpt as *mut InactivePageTable0, addr);}
         }
     }
 
     fn unmap(&self, pt: &mut PageTable, inpt: usize, addr: VirtAddr){
         info!("COME into Swap unmap, addr");
         unsafe{
-            self.swap_ext.remove_from_swappable(pt, inpt as *mut InactivePageTable0, addr, || InactivePageTable0::alloc_frame().expect("alloc frame failed"));
+            self.swap_ext.lock().remove_from_swappable(pt, inpt as *mut InactivePageTable0, addr, || InactivePageTable0::alloc_frame().expect("alloc frame failed"));
         }
         if pt.get_entry(addr).expect("fail to get entry").present(){
             let target = pt.get_entry(addr).expect("fail to get entry").target();
@@ -375,7 +315,7 @@ impl MemoryHandler for SwapMemoryHandler{
                     //let new_entry = self.page_table.map(addr, frame);
                     self.flags.apply(entry);
                 }
-                unsafe{self.swap_ext.set_swappable(page_table, inpt as *mut InactivePageTable0, Page::of_addr(addr).start_address())};
+                unsafe{self.swap_ext.lock().set_swappable(page_table, inpt as *mut InactivePageTable0, Page::of_addr(addr).start_address())};
                 //area.get_flags().apply(new_entry); this instruction may be used when hide attr is used
                 info!("allocated successfully");
                 return true;
@@ -391,7 +331,7 @@ impl MemoryHandler for SwapMemoryHandler{
         }
         // Allocate a frame, if failed, swap out a page
         let frame = InactivePageTable0::alloc_frame().expect("alloc frame failed");
-        self.swap_ext.swap_in(page_table, inpt as *mut InactivePageTable0, addr, frame).ok().unwrap();
+        self.swap_ext.lock().swap_in(page_table, inpt as *mut InactivePageTable0, addr, frame).ok().unwrap();
         true
         
     }
@@ -424,7 +364,7 @@ impl MemoryHandler for SwapMemoryHandler{
                 page_table.edit(|pt|{
                     let target = InactivePageTable0::alloc_frame().expect("failed to allocate frame");
                     flags.apply(pt.map(addr, target));
-                    swap_ext.set_swappable(pt, inpt as *mut InactivePageTable0, addr);
+                    swap_ext.lock().set_swappable(pt, inpt as *mut InactivePageTable0, addr);
                 });
                 let data: Vec<u8> = Vec::from(slice::from_raw_parts(addr as *const u8, PAGE_SIZE));
                 page_table.with(||{
@@ -439,7 +379,7 @@ impl MemoryHandler for SwapMemoryHandler{
 
 
 impl SwapMemoryHandler{
-    pub fn new(swap_ext: Arc<SwapExtType>, flags: MemoryAttr, delay_alloc: Vec<VirtAddr>) -> Self {
+    pub fn new(swap_ext: Arc<spin::Mutex<SwapExtType>>, flags: MemoryAttr, delay_alloc: Vec<VirtAddr>) -> Self {
         SwapMemoryHandler{
             swap_ext,
             flags,
@@ -458,7 +398,7 @@ impl Clone for SwapMemoryHandler{
 
 
 pub struct CowMemoryHandler{
-    cow_ext: Arc<CowExt>,
+    cow_ext: Arc<spin::Mutex<CowExt>>,
     flags: MemoryAttr,
 }
 
@@ -478,7 +418,7 @@ impl MemoryHandler for CowMemoryHandler{
         //entry.set_writable(false);
         entry.set_shared(!self.flags.is_readonly());
         entry.update();
-        self.cow_ext.map_to_shared(target, !self.flags.is_readonly());
+        self.cow_ext.lock().map_to_shared(target, !self.flags.is_readonly());
     }
 
     fn unmap(&self, pt: &mut PageTable, inpt: usize, addr: VirtAddr){
@@ -486,7 +426,7 @@ impl MemoryHandler for CowMemoryHandler{
         let target = pt.get_entry(addr).expect("fail to get entry").target();
         pt.unmap(addr);
         //info!("finish pt.unmap");
-        if self.cow_ext.unmap_shared(target, !self.flags.is_readonly()){
+        if self.cow_ext.lock().unmap_shared(target, !self.flags.is_readonly()){
             //info!("finish unmap_shared");
             InactivePageTable0::dealloc_frame(target);
         }
@@ -499,7 +439,7 @@ impl MemoryHandler for CowMemoryHandler{
             return false;
         }
         let target = page_table.get_entry(addr).expect("fail to get entry").target();
-        if self.cow_ext.is_one_shared(target){
+        if self.cow_ext.lock().is_one_shared(target){
             let entry = page_table.get_entry(addr).expect("fail to get entry");
             entry.set_writable(true);
             entry.update();
@@ -508,13 +448,13 @@ impl MemoryHandler for CowMemoryHandler{
             unsafe{
                 let page_addr = Page::of_addr(addr).start_address();
                 let data: Vec<u8> = Vec::from(slice::from_raw_parts(page_addr as *const u8, PAGE_SIZE));
-                self.cow_ext.unmap_shared(target, true);
+                self.cow_ext.lock().unmap_shared(target, true);
                 let new_target = InactivePageTable0::alloc_frame().expect("failed to allocate frame");
                 let entry = page_table.get_entry(addr).expect("fail to get entry");
                 entry.set_writable(true);
                 entry.set_target(new_target);
                 entry.update();
-                self.cow_ext.map_to_shared(new_target, !self.flags.is_readonly());
+                self.cow_ext.lock().map_to_shared(new_target, !self.flags.is_readonly());
                 let page_mut = slice::from_raw_parts_mut(page_addr as *mut u8, PAGE_SIZE);
                 page_mut.copy_from_slice(data.as_slice());
             }
@@ -541,14 +481,14 @@ impl MemoryHandler for CowMemoryHandler{
                 entry.set_writable(false);
                 entry.set_shared(!flags.is_readonly());
                 entry.update();
-                cow_ext.map_to_shared(target, !flags.is_readonly());
+                cow_ext.lock().map_to_shared(target, !flags.is_readonly());
             });
         }
     }
 }
 
 impl CowMemoryHandler{
-    pub fn new(cow_ext: Arc<CowExt>, flags: MemoryAttr) -> Self {
+    pub fn new(cow_ext: Arc<spin::Mutex<CowExt>>, flags: MemoryAttr) -> Self {
         CowMemoryHandler{
             cow_ext,
             flags,
@@ -563,4 +503,3 @@ impl Clone for CowMemoryHandler{
         CowMemoryHandler::new(self.cow_ext.clone(), self.flags.clone())
     }
 }
-*/

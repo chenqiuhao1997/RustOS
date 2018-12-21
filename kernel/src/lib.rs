@@ -45,6 +45,7 @@ mod consts;
 mod syscall;
 mod fs;
 mod trap;
+mod sync;
 
 #[cfg(target_arch = "riscv32")]
 #[path = "arch/riscv32/mod.rs"]

@@ -7,7 +7,6 @@ use core::slice;
 use ::memory::{InactivePageTable0};
 use memory::MemorySet;
 use spin::Mutex;
-//use process::context::memory_set_map_swappable;
 
 // Hard link user program
 #[cfg(target_arch = "riscv32")]
