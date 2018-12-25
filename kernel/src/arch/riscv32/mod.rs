@@ -44,9 +44,9 @@ fn others_main() -> ! {
 }
 
 fn lab_test(){
-    println!("lab_test!");
     use super::memory;
-    memory::lab_test();
+    memory::test::lab_test();
+    println!("kernel lab_test finished");
 }
 
 #[cfg(feature = "no_bbl")]

@@ -129,9 +129,25 @@ pub fn init_heap() {
 //        test_with(&mut active_table());
 //    }
 //}
-pub fn lab_test() {
-    println!("memory lab test");
+pub mod test{
+    pub fn lab_test(){
+        simple_memory_handler_test();    
+        println!("memory lab_test finished");
+    } 
+    fn simple_memory_handler_test() {
+        use super::{*};
+        let mut mhandler = SimpleMemoryHandler::new(0x0, 0x0, MemoryAttr::default());
+        let mut temp_table = active_table();
+        let inpt = 0x0;
+        mhandler.map(temp_table.get_data_mut(), inpt, 0x0);
+        assert!(temp_table.get_entry(0x0).expect("failed to get entry").present());
+        assert_eq!(temp_table.get_entry(0x0).expect("failed to get entry").target(), 0x0);
+        mhandler.unmap(temp_table.get_data_mut(), inpt, 0x0);
+        assert!(!temp_table.get_entry(0x0).expect("failed to get entry").present());
+        println!("simple_memory_handler_test finished");
+    }
 }
+
 
 /// MemoryHandler for kernel memory
 #[derive(Debug, Eq, PartialEq, Clone)]
