@@ -3,7 +3,6 @@ use core::any::Any;
 use core::slice;
 
 use ::memory::{InactivePageTable0};
-use memory::MemorySet;
 use spin::Mutex;
 
 // Hard link user program

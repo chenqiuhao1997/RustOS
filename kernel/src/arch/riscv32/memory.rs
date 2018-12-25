@@ -1,5 +1,5 @@
 use core::{slice, mem};
-use memory::{active_table, FRAME_ALLOCATOR, init_heap, MemoryArea, MemoryAttr, MemorySet, SimpleMemoryHandler};
+use memory::{active_table, FRAME_ALLOCATOR, init_heap};
 use super::riscv::{addr::*, register::sstatus};
 use ucore_memory::PAGE_SIZE;
 use alloc::boxed::Box;
@@ -19,8 +19,6 @@ pub fn init() {
     // initialize heap and Frame allocator
     init_frame_allocator();
     init_heap();
-    // remap the kernel use 4K page
-    remap_the_kernel();
 }
 
 pub fn init_other() {
@@ -57,24 +55,6 @@ fn init_frame_allocator() {
         let page_end = (end - MEMORY_OFFSET - 1) / PAGE_SIZE + 1;
         page_start..page_end
     }
-}
-
-/*
-* @brief:
-*   remmap the kernel memory address with 4K page recorded in p1 page table
-*/
-fn remap_the_kernel() {
-    let mut ms = MemorySet::new_bare();
-    #[cfg(feature = "no_bbl")]
-    ms.push(MemoryArea::new(0x10000000, 0x10000008, Box::new(SimpleMemoryHandler::new(0x10000000, 0x10000000, MemoryAttr::default())), "serial"));
-    ms.push(MemoryArea::new(stext as usize, etext as usize, Box::new(SimpleMemoryHandler::new(stext as usize, stext as usize, MemoryAttr::default().execute().readonly())), "text"));
-    ms.push(MemoryArea::new(sdata as usize, edata as usize, Box::new(SimpleMemoryHandler::new(sdata as usize, sdata as usize, MemoryAttr::default())), "data"));
-    ms.push(MemoryArea::new(srodata as usize, erodata as usize, Box::new(SimpleMemoryHandler::new(srodata as usize, srodata as usize, MemoryAttr::default().readonly())), "rodata"));
-    ms.push(MemoryArea::new(sbss as usize, ebss as usize, Box::new(SimpleMemoryHandler::new(sbss as usize, sbss as usize, MemoryAttr::default())), "bss"));
-    unsafe { ms.activate(); }
-    unsafe { SATP = ms.token(); }
-    mem::forget(ms);
-    info!("kernel remap end");
 }
 
 // First core stores its SATP here.
