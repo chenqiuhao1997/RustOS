@@ -122,13 +122,6 @@ pub fn init_heap() {
     info!("heap init end");
 }
 
-//pub mod test {
-//    pub fn cow() {
-//        use super::*;
-//        use ucore_memory::cow::test::test_with;
-//        test_with(&mut active_table());
-//    }
-//}
 pub mod test{
     pub fn lab_test(){
         simple_memory_handler_test();    
