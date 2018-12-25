@@ -111,7 +111,7 @@ impl Drop for KernelStack {
 *   Return true to continue, false to halt
 */
 pub fn page_fault_handler(addr: usize) -> bool {
-    //since we don't have any process now, we don't need handle the page fault
+    //since we don't have any process now, we don't need to handle the page fault
     false
 }
 
@@ -129,6 +129,9 @@ pub fn init_heap() {
 //        test_with(&mut active_table());
 //    }
 //}
+pub fn lab_test() {
+    println!("memory lab test");
+}
 
 /// MemoryHandler for kernel memory
 #[derive(Debug, Eq, PartialEq, Clone)]

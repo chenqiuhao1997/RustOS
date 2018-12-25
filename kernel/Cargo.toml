@@ -6,6 +6,7 @@ authors = ["Runji Wang <wangrunji0408@163.com>"]
 [features]
 link_user_program = []
 no_bbl = []
+lab_test = []
 
 [profile.dev]
 # MUST >= 1 : Enable RVO to avoid stack overflow

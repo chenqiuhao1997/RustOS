@@ -27,8 +27,11 @@ pub extern fn rust_main(hartid: usize, dtb: usize, hart_mask: usize) -> ! {
     timer::init();
     //::process::init();
     unsafe{interrupt::restore(2);}
-
     unsafe { cpu::start_others(hart_mask); }
+
+    #[cfg(feature = "lab_test")]
+    lab_test();
+    
     ::kmain();
 }
 
@@ -36,7 +39,14 @@ fn others_main() -> ! {
     interrupt::init();
     memory::init_other();
     timer::init();
+    
     ::kmain();
+}
+
+fn lab_test(){
+    println!("lab_test!");
+    use super::memory;
+    memory::lab_test();
 }
 
 #[cfg(feature = "no_bbl")]

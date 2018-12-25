@@ -42,6 +42,10 @@ ifdef board
 features := $(features) no_bbl
 endif
 
+ifdef test
+features := $(features) lab_test
+endif
+
 # Link user binaries at ../user
 ifdef link_user
 features := $(features) link_user_program

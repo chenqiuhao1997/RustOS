@@ -7,6 +7,7 @@ pub fn timer() {
     if cpu::id() == 0 {
         unsafe { TICK += 1; }
     }
+    #[cfg(not(feature = "lab_test"))]
     unsafe{  if (TICK & 63)==0 {println!("ticks 0x{tick:08x}", tick=TICK);}}
 }
 
