@@ -16,7 +16,7 @@
 
 #[macro_use]
 extern crate alloc;
-extern crate bit_allocator;
+//extern crate bit_allocator;
 extern crate bit_field;
 #[macro_use]
 extern crate bitflags;
@@ -28,7 +28,6 @@ extern crate log;
 #[macro_use]
 extern crate once;
 extern crate spin;
-extern crate ucore_memory;
 extern crate volatile;
 extern crate xmas_elf;
 
@@ -43,7 +42,6 @@ mod consts;
 mod syscall;
 mod fs;
 mod trap;
-mod sync;
 
 #[cfg(target_arch = "riscv32")]
 #[path = "arch/riscv32/mod.rs"]

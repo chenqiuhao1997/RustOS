@@ -1,6 +1,6 @@
 use super::riscv::register::*;
 pub use self::context::*;
-use ::memory::{InactivePageTable0};
+//use ::memory::{InactivePageTable0};
 
 #[path = "context.rs"]
 mod context;

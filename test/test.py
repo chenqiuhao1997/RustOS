@@ -1,6 +1,6 @@
 import os, sys, time, subprocess, signal
 
-unit_test = ['/crate/memory']
+unit_test = []
 
 realpath = sys.path[0]
 os.system(realpath+'/clean_and_make.sh')
@@ -10,7 +10,7 @@ for unit_test_path in unit_test:
 		sys.exit(1)
 		
 # code for lab_test
-labtest_checklist = ["simple_memory_handler_test finished"]
+labtest_checklist = ["kernel lab_test finished"]
 qemu = subprocess.Popen(realpath+'/make_and_test.sh', shell=True, \
 		stdin=subprocess.PIPE, \
 		stdout=subprocess.PIPE, \

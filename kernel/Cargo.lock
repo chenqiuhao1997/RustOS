@@ -11,13 +11,6 @@ name = "bbl"
 version = "0.1.0"
 
 [[package]]
-name = "bit-allocator"
-version = "0.1.0"
-dependencies = [
- "bit_field 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "bit_field"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -107,7 +100,6 @@ name = "ucore"
 version = "0.1.0"
 dependencies = [
  "bbl 0.1.0",
- "bit-allocator 0.1.0",
  "bit_field 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "cc 1.0.25 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -117,17 +109,8 @@ dependencies = [
  "once 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "riscv 0.3.0 (git+https://github.com/riscv-and-rust-and-decaf/riscv)",
  "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "ucore-memory 0.1.0",
  "volatile 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "xmas-elf 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "ucore-memory"
-version = "0.1.0"
-dependencies = [
- "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

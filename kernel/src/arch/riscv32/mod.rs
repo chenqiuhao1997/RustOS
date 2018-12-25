@@ -4,8 +4,8 @@ extern crate bbl;
 pub mod io;
 pub mod interrupt;
 pub mod timer;
-pub mod paging;
-pub mod memory;
+//pub mod paging;
+//pub mod memory;
 pub mod compiler_rt;
 pub mod consts;
 pub mod cpu;
@@ -23,9 +23,7 @@ pub extern fn rust_main(hartid: usize, dtb: usize, hart_mask: usize) -> ! {
 
     ::logging::init();
     interrupt::init();
-    memory::init();
     timer::init();
-    //::process::init();
     unsafe{interrupt::restore(2);}
     unsafe { cpu::start_others(hart_mask); }
 
@@ -37,15 +35,14 @@ pub extern fn rust_main(hartid: usize, dtb: usize, hart_mask: usize) -> ! {
 
 fn others_main() -> ! {
     interrupt::init();
-    memory::init_other();
     timer::init();
     
     ::kmain();
 }
 
 fn lab_test(){
-    use super::memory;
-    memory::test::lab_test();
+    //use super::memory;
+    //memory::test::lab_test();
     println!("kernel lab_test finished");
 }
 
