@@ -6,6 +6,7 @@
 # 	make asm					Open the deassemble file of the last build
 # 	make elf-h					Open 'objdump -h' of the last build
 # 	make clean					Clean
+#   make test                   Build for test and run
 #
 # Options:
 #   arch = x86_64 | riscv32
@@ -14,11 +15,13 @@
 #   LOG  = off | error | warn | info | debug | trace
 #   smp                         SMP core number
 #   board 						Only available on riscv32, build without bbl, run on board
+#   test_target = no_test | ... choose target to test       
 
 arch ?= riscv32
 mode ?= debug
 LOG  ?= debug
 smp  ?= 4
+test_target ?= no_test
 
 target := $(arch)-blog_os
 kernel := target/$(target)/$(mode)/ucore
@@ -59,6 +62,8 @@ ifdef d
 qemu_opts := $(qemu_opts) -d $(d)
 endif
 
+features := $(features) $(test_target)
+
 build_args := --target $(target).json --features "$(features)"
 
 ifeq ($(mode), release)
@@ -78,12 +83,13 @@ ifeq ($(arch), riscv32)
 prefix := riscv64-unknown-elf-
 endif
 
+
 ld := $(prefix)ld
 objdump := $(prefix)objdump
 cc := $(prefix)gcc
 as := $(prefix)as
 
-.PHONY: all clean run build asm doc justrun kernel
+.PHONY: all clean run build asm doc justrun kernel test
 
 all: $(kernel)
 
@@ -95,6 +101,8 @@ doc:
 	@cargo rustdoc -- --document-private-items
 
 run: build justrun
+
+test: build justrun
 
 justrun:
 	@qemu-system-$(arch) $(qemu_opts) || [ $$? -eq 11 ] # run qemu and assert it exit 11

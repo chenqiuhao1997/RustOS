@@ -25,8 +25,15 @@ pub fn init() {
     for i in 0..4 {
         manager.add(ContextImpl::new_kernel(idle, i), 0);
     }
+    #[cfg(feature = "no_test")]
     ::shell::run_user_shell();
-    //::thread::spawn(::sync::test::philosopher_using_mutex);
+
+    
+    #[cfg(feature = "test_mutex_philosopher")]
+    ::thread::spawn(::sync::test::philosopher_using_mutex);
+
+    #[cfg(feature = "test_monitor_philosopher")]
+    ::thread::spawn(::sync::test::philosopher_using_monitor);
 
     info!("process init end");
 }
