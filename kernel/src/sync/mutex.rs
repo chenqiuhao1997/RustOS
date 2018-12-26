@@ -218,8 +218,6 @@ impl MutexSupport for Spin {
     fn new() -> Self { Spin }
     fn cpu_relax(&self) {
         unsafe {
-            #[cfg(target_arch = "x86_64")]
-                asm!("pause" :::: "volatile");
             #[cfg(target_arch = "riscv32")]
                 asm!("nop" :::: "volatile");
         }
@@ -248,8 +246,6 @@ impl MutexSupport for SpinNoIrq {
     }
     fn cpu_relax(&self) {
         unsafe {
-            #[cfg(target_arch = "x86_64")]
-                asm!("pause" :::: "volatile");
             #[cfg(target_arch = "riscv32")]
                 asm!("nop" :::: "volatile");
         }

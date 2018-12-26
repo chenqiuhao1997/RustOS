@@ -1,7 +1,5 @@
 use simple_filesystem::*;
 use alloc::{boxed::Box, sync::Arc, string::String, collections::VecDeque, vec::Vec};
-#[cfg(target_arch = "x86_64")]
-use arch::driver::ide;
 use sync::Condvar;
 use sync::SpinNoIrqLock as Mutex;
 use core::any::Any;
@@ -33,8 +31,6 @@ lazy_static! {
             }
             Box::new(unsafe { MemBuf::new(_user_img_start, _user_img_end) })
         };
-        #[cfg(target_arch = "x86_64")]
-        let device = Box::new(ide::IDE::new(1));
 
         let sfs = SimpleFileSystem::open(device).expect("failed to open SFS");
         sfs.root_inode()
@@ -62,20 +58,6 @@ impl Device for MemBuf {
     }
 }
 
-#[cfg(target_arch = "x86_64")]
-impl BlockedDevice for ide::IDE {
-    const BLOCK_SIZE_LOG2: u8 = 9;
-    fn read_at(&mut self, block_id: usize, buf: &mut [u8]) -> bool {
-        assert!(buf.len() >= ide::BLOCK_SIZE);
-        let buf = unsafe { slice::from_raw_parts_mut(buf.as_ptr() as *mut u32, ide::BLOCK_SIZE / 4) };
-        self.read(block_id as u64, 1, buf).is_ok()
-    }
-    fn write_at(&mut self, block_id: usize, buf: &[u8]) -> bool {
-        assert!(buf.len() >= ide::BLOCK_SIZE);
-        let buf = unsafe { slice::from_raw_parts(buf.as_ptr() as *mut u32, ide::BLOCK_SIZE / 4) };
-        self.write(block_id as u64, 1, buf).is_ok()
-    }
-}
 
 #[derive(Default)]
 pub struct Stdin {

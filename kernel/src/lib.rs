@@ -32,8 +32,6 @@ extern crate spin;
 extern crate ucore_memory;
 extern crate ucore_process;
 extern crate volatile;
-#[cfg(target_arch = "x86_64")]
-extern crate x86_64;
 extern crate xmas_elf;
 
 pub use process::{processor, new_kernel_context};
@@ -53,10 +51,6 @@ mod sync;
 mod trap;
 mod shell;
 
-#[allow(dead_code)]
-#[cfg(target_arch = "x86_64")]
-#[path = "arch/x86_64/mod.rs"]
-pub mod arch;
 
 #[cfg(target_arch = "riscv32")]
 #[path = "arch/riscv32/mod.rs"]
