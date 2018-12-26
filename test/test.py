@@ -90,17 +90,102 @@ checklist = {
 		'sleepkill pass.',
 	]}
 }
+philosopher_num = 5
+ph_iter_num = 5
+philosopher_methods = ['mutex', 'monitor']
 
 unit_test = ['/crate/process', '/crate/memory']
 
 realpath = sys.path[0]
 os.system(realpath+'/clean_and_make.sh')
+
+
 for unit_test_path in unit_test:
 	if os.system('cd '+realpath+' && cd ..'+unit_test_path+' && cargo test'):
 		print("unit test "+unit_test_path+" error")
 		sys.exit(1)
-		
 
+
+for method in philosopher_methods:
+	qemu = subprocess.Popen(realpath+'/make_and_run.sh test_'+method+'_philosopher', shell=True, \
+		stdin=subprocess.PIPE, \
+		stdout=subprocess.PIPE, \
+		stderr = subprocess.PIPE,\
+		preexec_fn = os.setsid, close_fds=True \
+		)
+	time.sleep(80)
+	os.kill(-qemu.pid, 9)
+	res = qemu.stdout.read()
+	start = res.find("philosophers using "+method)
+	if start < 0 :
+		print("Error before test philosophers")
+		sys.exit(2)
+	res = res[start:]
+	start = res.find("philosophers dining end")
+	if start < 0 :
+		print("Test philosophers have not finished")
+		sys.exit(2)
+	res = res.split('\n')[1:-1]
+	chi = [1 for i in range(philosopher_num)]
+	its = [0 for i in range(philosopher_num)]
+	eat = [-1 for i in range(philosopher_num)]
+	for line in res:
+		ph_num = ord(line[3])-ord('0')-1
+		if line[0] == '0':
+			if eat[ph_num] == -1:
+				eat[ph_num] = 0
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+		if line[0] == '1':
+			if eat[ph_num] == 0:
+				eat[ph_num] = 1
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+			if chi[ph_num] == 1:
+				chi[ph_num] = 0
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+			if chi[(ph_num+1)%philosopher_num] == 1:
+				chi[(ph_num+1)%philosopher_num] = 0
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+		if line[0] == '2':
+			if eat[ph_num] == 1:
+				eat[ph_num] = 2
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+			if chi[ph_num] == 0:
+				chi[ph_num] = 1
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+			if chi[(ph_num+1)%philosopher_num] == 0:
+				chi[(ph_num+1)%philosopher_num] = 1
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+		if line[0] == '3':
+			if eat[ph_num] == 2:
+				eat[ph_num] = -1
+			else:
+				print("Test philosophers failed")
+				sys.exit(4)
+			its[ph_num] += 1
+	if its != [ph_iter_num for i in range(philosopher_num)]:
+		print("Test philosophers failed")
+		sys.exit(4)
+	print(method+" philosopher: OK")
+
+
+
+
+
+os.system(realpath+'/clean_and_make.sh')
 for testcase in checklist.keys():
 	qemu = subprocess.Popen(realpath+'/make_and_run.sh', shell=True, \
 		stdin=subprocess.PIPE, \

@@ -79,7 +79,10 @@ impl Processor {
     }
 
     pub fn pid(&self) -> Pid {
-        self.inner().proc.as_ref().unwrap().0
+        match self.inner().proc.as_ref() {
+            None => 0, 
+            _ => self.inner().proc.as_ref().unwrap().0
+        }
     }
 
     pub fn context(&self) -> &Context {

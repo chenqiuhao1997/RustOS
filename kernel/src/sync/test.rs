@@ -28,7 +28,7 @@ impl Philosopher {
     }
 
     fn think(&self) {
-        println!("{} is thinking.", self.name);
+        println!("0: {} is thinking.", self.name);
         thread::sleep(Duration::from_secs(1));
     }
 }
@@ -46,8 +46,9 @@ impl Table for MutexTable {
         let _left = self.forks[left].lock();
         let _right = self.forks[right].lock();
 
-        println!("{} is eating.", name);
+        println!("1: {} is eating.", name);
         thread::sleep(Duration::from_secs(1));
+        println!("2: {} finishes eating.", name);
     }
 }
 
@@ -69,8 +70,9 @@ impl Table for MonitorTable {
             }
             fork_status[right] = true;
         }
-        println!("{} is eating.", name);
+        println!("1: {} is eating.", name);
         thread::sleep(Duration::from_secs(1));
+        println!("2: {} finishes eating.", name);
         {
             let mut fork_status = self.fork_status.lock();
             fork_status[left] = false;
@@ -98,7 +100,7 @@ fn philosopher(table: Arc<Table>) {
             for i in 0..5 {
                 p.think();
                 p.eat(&table);
-                println!("{} iter {} end.", p.name, i);
+                println!("3: {} iter {} end.", p.name, i);
             }
         })
     }).collect();
