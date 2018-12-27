@@ -7,7 +7,6 @@ use alloc::{boxed::Box, collections::BTreeMap, vec::Vec, sync::Arc, string::Stri
 use ucore_memory::{Page, VirtAddr};
 use ::memory::{InactivePageTable0};
 use ucore_memory::memory_set::*;
-use simple_filesystem::file::File;
 use spin::Mutex;
 
 
@@ -17,7 +16,6 @@ pub struct ContextImpl {
     pub arch: ArchContext,
     pub memory_set: Box<MemorySet>,
     pub kstack: KernelStack,
-    pub files: BTreeMap<usize, Arc<Mutex<File>>>,
     pub cwd: String,
 }
 
@@ -35,7 +33,6 @@ impl ContextImpl {
             arch: ArchContext::null(),
             memory_set: Box::new(MemorySet::new()),
             kstack: KernelStack::new(),
-            files: BTreeMap::default(),
             cwd: String::new(),
         })
     }
@@ -47,7 +44,6 @@ impl ContextImpl {
             arch: unsafe { ArchContext::new_kernel_thread(entry, arg, kstack.top(), memory_set.token()) },
             memory_set,
             kstack,
-            files: BTreeMap::default(),
             cwd: String::new(),
         })
     }
@@ -145,7 +141,6 @@ impl ContextImpl {
             },
             memory_set,
             kstack,
-            files: BTreeMap::default(),
             cwd: String::new(),
         });
         //set the user Memory pages in the memory set swappable
@@ -203,7 +198,6 @@ impl ContextImpl {
             arch: unsafe { ArchContext::new_fork(tf, kstack.top(), memory_set.token()) },
             memory_set,
             kstack,
-            files: BTreeMap::default(),
             cwd: String::new(),
         });
 

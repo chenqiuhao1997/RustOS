@@ -27,7 +27,7 @@ extern crate linked_list_allocator;
 extern crate log;
 #[macro_use]
 extern crate once;
-extern crate simple_filesystem;
+extern crate simple_filesystem; //just use for user program read
 extern crate spin;
 extern crate ucore_memory;
 extern crate ucore_process;

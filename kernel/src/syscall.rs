@@ -4,7 +4,6 @@ use arch::interrupt::TrapFrame;
 use process::*;
 use thread;
 use util;
-use simple_filesystem::{INode, file::File, FileInfo, FileType};
 use core::{slice, str};
 use alloc::sync::Arc;
 use spin::Mutex;
@@ -15,17 +14,17 @@ use alloc::string::String;
 pub fn syscall(id: usize, args: [usize; 6], tf: &mut TrapFrame) -> i32 {
     let ret = match id {
         // file
-        100 => sys_open(args[0] as *const u8, args[1]),
-        101 => sys_close(args[0]),
+        100 => Ok(0),  //sys_open(args[0] as *const u8, args[1]),
+        101 => Ok(0),  //sys_close(args[0]),
         102 => sys_read(args[0], args[1] as *mut u8, args[2]),
         103 => sys_write(args[0], args[1] as *const u8, args[2]),
         030 => sys_putc(args[0] as u8 as char),
 //        104 => sys_seek(),
-        110 => sys_fstat(args[0], args[1] as *mut Stat),
+        110 => Ok(0),  //sys_fstat(args[0], args[1] as *mut Stat),
 //        111 => sys_fsync(),
 //        121 => sys_getcwd(),
-        128 => sys_getdirentry(args[0], args[1] as *mut DirEntry),
-        130 => sys_dup(args[0], args[1]),
+        128 => Ok(0),  //sys_getdirentry(args[0], args[1] as *mut DirEntry),
+        130 => Ok(0),  //sys_dup(args[0], args[1]),
 
         // process
         001 => sys_exit(args[0] as i32),
@@ -58,85 +57,36 @@ pub fn syscall(id: usize, args: [usize; 6], tf: &mut TrapFrame) -> i32 {
 }
 
 fn sys_read(fd: usize, base: *mut u8, len: usize) -> SysResult {
-    // TODO: check ptr
-    info!("read: fd: {}, base: {:?}, len: {:#x}", fd, base, len);
-    let slice = unsafe { slice::from_raw_parts_mut(base, len) };
-    let len = get_file(fd)?.lock().read(slice)?;
-    Ok(len as i32)
+    info!("sys_read");
+    unimplemented!()
 }
 
 fn sys_write(fd: usize, base: *const u8, len: usize) -> SysResult {
-    // TODO: check ptr
-    info!("write: fd: {}, base: {:?}, len: {:#x}", fd, base, len);
-    let slice = unsafe { slice::from_raw_parts(base, len) };
-    let len = get_file(fd)?.lock().write(slice)?;
-    Ok(len as i32)
+    info!("sys_write");
+    unimplemented!()
 }
 
 fn sys_open(path: *const u8, flags: usize) -> SysResult {
-    // TODO: check ptr
-    let path = unsafe { util::from_cstr(path) };
-    let flags = VfsFlags::from_ucore_flags(flags);
-    info!("open: path: {:?}, flags: {:?}", path, flags);
-    let (fd, inode) = match path {
-        "stdin:" => (0, ::fs::STDIN.clone() as Arc<INode>),
-        "stdout:" => (1, ::fs::STDOUT.clone() as Arc<INode>),
-        _ => {
-            let fd = (3..).find(|i| !process().files.contains_key(i)).unwrap();
-            let inode = ::fs::ROOT_INODE.lookup(path)?;
-            (fd, inode)
-        }
-    };
-    let file = File::new(inode, flags.contains(VfsFlags::READABLE), flags.contains(VfsFlags::WRITABLE));
-    process().files.insert(fd, Arc::new(Mutex::new(file)));
-    Ok(fd as i32)
+    info!("sys_open");
+    unimplemented!()
 }
 
 fn sys_close(fd: usize) -> SysResult {
-    info!("close: fd: {:?}", fd);
-    match process().files.remove(&fd) {
-        Some(_) => Ok(0),
-        None => Err(SysError::InvalidFile),
-    }
-}
-
-fn sys_fstat(fd: usize, stat_ptr: *mut Stat) -> SysResult {
-    // TODO: check ptr
-    info!("fstat: {}", fd);
-    let file = get_file(fd)?;
-    let stat = Stat::from(file.lock().info()?);
-    unsafe { stat_ptr.write(stat); }
-    Ok(0)
+    info!("sys_close");
+    unimplemented!()
 }
 
 /// entry_id = dentry.offset / 256
 /// dentry.name = entry_name
 /// dentry.offset += 256
 fn sys_getdirentry(fd: usize, dentry_ptr: *mut DirEntry) -> SysResult {
-    // TODO: check ptr
-    info!("getdirentry: {}", fd);
-    let file = get_file(fd)?;
-    let dentry = unsafe { &mut *dentry_ptr };
-    if !dentry.check() {
-        return Err(SysError::InvalidArgument);
-    }
-    let info = file.lock().info()?;
-    if info.type_ != FileType::Dir || info.size <= dentry.entry_id() {
-        return Err(SysError::InvalidArgument);
-    }
-    let name = file.lock().get_entry(dentry.entry_id())?;
-    dentry.set_name(name.as_str());
-    Ok(0)
+    info!("sys_getdirentry");
+    unimplemented!()
 }
 
 fn sys_dup(fd1: usize, fd2: usize) -> SysResult {
-    info!("dup: {} {}", fd1, fd2);
-    let file = get_file(fd1)?;
-    if process().files.contains_key(&fd2) {
-        return Err(SysError::InvalidFile);
-    }
-    process().files.insert(fd2, file.clone());
-    Ok(0)
+    info!("sys_dup");
+    unimplemented!()
 }
 
 /// Fork the current process. Return the child's PID.
@@ -274,10 +224,6 @@ fn sys_putc(c: char) -> SysResult {
     Ok(0)
 }
 
-fn get_file(fd: usize) -> Result<&'static Arc<Mutex<File>>, SysError> {
-    process().files.get(&fd).ok_or(SysError::InvalidFile)
-}
-
 pub type SysResult = Result<i32, SysError>;
 
 #[repr(i32)]
@@ -333,48 +279,5 @@ impl DirEntry {
         self.name[..name.len()].copy_from_slice(name.as_bytes());
         self.name[name.len()] = 0;
         self.offset += 256;
-    }
-}
-
-#[repr(C)]
-struct Stat {
-    /// protection mode and file type
-    mode: StatMode,
-    /// number of hard links
-    nlinks: u32,
-    /// number of blocks file is using
-    blocks: u32,
-    /// file size (bytes)
-    size: u32,
-}
-
-bitflags! {
-    struct StatMode: u32 {
-        const NULL  = 0;
-        /// ordinary regular file
-        const FILE  = 0o10000;
-        /// directory
-        const DIR   = 0o20000;
-        /// symbolic link
-        const LINK  = 0o30000;
-        /// character device
-        const CHAR  = 0o40000;
-        /// block device
-        const BLOCK = 0o50000;
-    }
-}
-
-impl From<FileInfo> for Stat {
-    fn from(info: FileInfo) -> Self {
-        Stat {
-            mode: match info.type_ {
-                FileType::File => StatMode::FILE,
-                FileType::Dir => StatMode::DIR,
-                _ => StatMode::NULL,
-            },
-            nlinks: info.nlinks as u32,
-            blocks: info.blocks as u32,
-            size: info.size as u32,
-        }
     }
 }

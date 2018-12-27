@@ -105,6 +105,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "simple-filesystem"
 version = "0.0.1"
+source = "git+https://github.com/wangrunji0408/SimpleFileSystem-Rust?branch=multi-thread#249383f7e3f195e0a8ce858f40394e9d5f7f58e0"
 dependencies = [
  "bit-vec 0.5.0 (git+https://github.com/AltSysrq/bit-vec.git)",
  "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -135,7 +136,7 @@ dependencies = [
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "once 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "riscv 0.3.0 (git+https://github.com/riscv-and-rust-and-decaf/riscv)",
- "simple-filesystem 0.0.1",
+ "simple-filesystem 0.0.1 (git+https://github.com/wangrunji0408/SimpleFileSystem-Rust?branch=multi-thread)",
  "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "ucore-memory 0.1.0",
  "ucore-process 0.1.0",
@@ -192,6 +193,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum rustc_version 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 "checksum semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
+"checksum simple-filesystem 0.0.1 (git+https://github.com/wangrunji0408/SimpleFileSystem-Rust?branch=multi-thread)" = "<none>"
 "checksum spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ceac490aa12c567115b40b7b7fceca03a6c9d53d5defea066123debc83c5dc1f"
 "checksum static_assertions 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "389ce475f424f267dbed6479cbd8f126c5e1afb053b0acdaa019c74305fc65d1"
 "checksum volatile 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "37c5d76c0f40ba4f8ac10ec4717d4e98ce3e58c5607eea36e9464226fc5e0a95"

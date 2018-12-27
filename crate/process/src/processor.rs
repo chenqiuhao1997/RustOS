@@ -53,6 +53,7 @@ impl Processor {
     ///   via switch back to the scheduler.
     pub fn run(&self) -> ! {
         let inner = self.inner();
+        debug!("process start run");
         unsafe { interrupt::disable_and_store(); }
         loop {
             let proc = inner.manager.run(inner.id);
@@ -61,6 +62,7 @@ impl Processor {
             unsafe {
                 inner.loop_context.switch_to(&mut *inner.proc.as_mut().unwrap().1);
             }
+            debug!("CPU{} run into main loop", inner.id);
             let (pid, context) = inner.proc.take().unwrap();
             trace!("CPU{} stop running process {}", inner.id, pid);
             inner.manager.stop(pid, context);
@@ -71,6 +73,7 @@ impl Processor {
     /// Yield and reschedule.
     pub fn yield_now(&self) {
         let inner = self.inner();
+        trace!("process {} yield_now", self.pid());
         unsafe {
             let flags = interrupt::disable_and_store();
             inner.proc.as_mut().unwrap().1.switch_to(&mut *inner.loop_context);

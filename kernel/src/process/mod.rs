@@ -26,7 +26,7 @@ pub fn init() {
         manager.add(ContextImpl::new_kernel(idle, i), 0);
     }
     #[cfg(feature = "no_test")]
-    ::shell::run_user_shell();
+    ::thread::spawn(::shell::shell);
 
     
     #[cfg(feature = "test_mutex_philosopher")]
