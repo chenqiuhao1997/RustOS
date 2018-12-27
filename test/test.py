@@ -116,10 +116,10 @@ for unit_test_path in unit_test:
 
 
 for testcase in checklist.keys():
-	os.system(realpath+'/clean_and_make.sh')
 	target = testcase
 	if checklist[testcase].has_key('target'):
 		target = ' ' + checklist[testcase]['target']
+	os.system(realpath+'/clean_and_make.sh'+target)
 	qemu = subprocess.Popen(realpath+'/make_and_run.sh'+target, shell=True, \
 		stdin=subprocess.PIPE, \
 		stdout=subprocess.PIPE, \
