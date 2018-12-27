@@ -23,6 +23,7 @@ mode ?= debug
 LOG  ?= debug
 smp  ?= 4
 test_target ?= no_test
+target_func ?= sh
 
 target := $(arch)-blog_os
 kernel := target/$(target)/$(mode)/ucore

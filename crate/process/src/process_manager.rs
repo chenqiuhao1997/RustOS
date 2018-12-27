@@ -88,8 +88,10 @@ impl ProcessManager {
             children: Vec::new(),
         });
         self.scheduler.lock().insert(0, pid);
-        self.procs[parent].lock().as_mut().expect("invalid parent proc")
-            .children.push(pid);
+        if pid != 0 {
+            self.procs[parent].lock().as_mut().expect("invalid parent proc")
+                .children.push(pid);
+        }
         debug!("add process {}", pid);
         pid
     }

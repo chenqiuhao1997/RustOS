@@ -116,7 +116,7 @@ for unit_test_path in unit_test:
 
 os.system(realpath+'/clean_and_make.sh')
 for testcase in checklist.keys():
-	target = ''
+	target = testcase
 	if checklist[testcase].has_key('target'):
 		target = ' ' + checklist[testcase]['target']
 	qemu = subprocess.Popen(realpath+'/make_and_run.sh'+target, shell=True, \

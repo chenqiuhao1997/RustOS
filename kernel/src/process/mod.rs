@@ -20,9 +20,8 @@ pub fn init() {
     extern fn idle(_arg: usize) -> ! {
         loop { cpu::halt(); }
     }
-    for i in 0..4 {
-        manager.add(ContextImpl::new_kernel(idle, i), 0);
-    }
+
+    
     ::shell::run_user_shell();
 
     info!("process init end");

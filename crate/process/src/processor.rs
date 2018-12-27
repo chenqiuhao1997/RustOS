@@ -57,14 +57,14 @@ impl Processor {
         unsafe { interrupt::disable_and_store(); }
         loop {
             let proc = inner.manager.run(inner.id);
-            trace!("CPU{} begin running process {}", inner.id, proc.0);
+            debug!("CPU{} begin running process {}", inner.id, proc.0);
             inner.proc = Some(proc);
             unsafe {
                 inner.loop_context.switch_to(&mut *inner.proc.as_mut().unwrap().1);
             }
             debug!("CPU{} run into main loop", inner.id);
             let (pid, context) = inner.proc.take().unwrap();
-            trace!("CPU{} stop running process {}", inner.id, pid);
+            debug!("CPU{} stop running process {}", inner.id, pid);
             inner.manager.stop(pid, context);
         }
     }
