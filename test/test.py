@@ -1,6 +1,6 @@
 import os, sys, time, subprocess, signal
 
-unit_test = ['/crate/memory', 'crate/bit-allocator']
+unit_test = ['/crate/memory', '/crate/bit-allocator']
 
 realpath = sys.path[0]
 os.system(realpath+'/clean_and_make.sh')
