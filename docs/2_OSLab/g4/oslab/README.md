@@ -38,8 +38,6 @@ make run smp=1 test=lab_test
 
 此外,可以参考王润基同学的[RustOS开发文档](https://rucore.gitbook.io/rust-os-docs/kai-fa-huan-jing-pei-zhi)
 
-
-
 ### 2 测试
 #### 2.1 单元测试
 针对crate内部的各模块实现了单元测试,该部分测试在有std环境下进行,主要目的是验证各模块的算法功能正确性.
@@ -88,10 +86,28 @@ python test.py
 
 此部分内容是整个RustOS的基本框架.
 
-本实验希望同学达到:
-* 了解操作系统启动
+本实验希望涉及到的知识点包括:
+* 操作系统启动的启动过程
+* 中断,异常,系统调用处理流程
+* IO操作的实现与调试信息的输出框架搭建
 
 #### 1.2 实验内容
+
+**练习1:**
+
+* 阅读操作系统的Makefile文件,了解系统的编译流程以及常用的编译选项.
+
+* 阅读lab1中RustOS的bootloader相关代码.
+
+* 阅读lab1中关于logging的功能实现,了解RustOS对于IO操作的实现方式.
+
+**练习2:**
+
+* 完成kernel/arch/riscv32/boot/trap.asm中对于中断信息的保存和恢复部分代码.
+
+* 完成kernel/arch/riscv32/interrupt.rs中的init()函数.
+
+* 完成kernel/trap.rs里面对于时钟中断的处理(timer函数). 
 
 
 ### Lab 2 物理内存管理
