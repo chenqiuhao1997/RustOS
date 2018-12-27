@@ -4,8 +4,6 @@ extern crate bbl;
 pub mod io;
 pub mod interrupt;
 pub mod timer;
-//pub mod paging;
-//pub mod memory;
 pub mod compiler_rt;
 pub mod consts;
 pub mod cpu;
@@ -41,8 +39,6 @@ fn others_main() -> ! {
 }
 
 fn lab_test(){
-    //use super::memory;
-    //memory::test::lab_test();
     println!("kernel lab_test finished");
 }
 
