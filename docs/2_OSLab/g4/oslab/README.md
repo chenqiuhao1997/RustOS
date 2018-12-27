@@ -172,6 +172,12 @@ python test.py
 
 * 完成crate/memory/src/swap/enhanced_clock.rs中对于可置换物理页管理的时钟算法的代码实现.
 
+#### 3.3 RustOS lab 中的虚拟内存管理方式
+
+RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(通常是用于进程fork时)的策略被抽象成了一个叫做MemoryHandler的trait,每个MemoryArea会保存一个自己独有的MemoryHandler,这使得每片内存区域能够具有自己独有的内存管理策略.
+
+在RustOS lab中,实现内存管理策略可以通过实现一个特定的MemoryHandler来实现.
+
 ### Lab4 内核线程管理
 #### 4.1 实验目的
 * 了解内核线程创建/执行的管理过程
@@ -180,7 +186,7 @@ python test.py
 #### 4.2 实验内容
 **练习1:**
 * 完成kernel/src/memory.rs中对于用户地址空间进行管理的MemoryHandler的极简实现。
- 
+
 *应该包括为进程分配资源的联系和switch相关内容的联系，视最终版本而定*
 
 
@@ -235,5 +241,7 @@ python test.py
 ### Lab8 文件系统
 
 #### 8.1 实验目的
+
+
 
 #### 8.2 实验内容
