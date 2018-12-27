@@ -31,11 +31,9 @@ use core::cell::UnsafeCell;
 use core::fmt;
 use core::ops::{Deref, DerefMut};
 use core::sync::atomic::{ATOMIC_BOOL_INIT, AtomicBool, Ordering};
-use super::Condvar;
 
 pub type SpinLock<T> = Mutex<T, Spin>;
 pub type SpinNoIrqLock<T> = Mutex<T, SpinNoIrq>;
-pub type ThreadLock<T> = Mutex<T, Condvar>;
 
 pub struct Mutex<T: ?Sized, S: MutexSupport>
 {
@@ -256,16 +254,3 @@ impl MutexSupport for SpinNoIrq {
     fn after_unlock(&self) {}
 }
 
-impl MutexSupport for Condvar {
-    type GuardData = ();
-    fn new() -> Self {
-        Condvar::new()
-    }
-    fn cpu_relax(&self) {
-        self._wait();
-    }
-    fn before_lock() -> Self::GuardData {}
-    fn after_unlock(&self) {
-        self.notify_one();
-    }
-}

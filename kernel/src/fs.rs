@@ -1,9 +1,9 @@
 use simple_filesystem::*;
 use alloc::{boxed::Box, sync::Arc, string::String, collections::VecDeque, vec::Vec};
-use sync::Condvar;
 use sync::SpinNoIrqLock as Mutex;
 use core::any::Any;
 use core::slice;
+use process::*;
 
 use ::memory::{InactivePageTable0};
 use memory::MemorySet;
@@ -62,20 +62,18 @@ impl Device for MemBuf {
 #[derive(Default)]
 pub struct Stdin {
     buf: Mutex<VecDeque<char>>,
-    pushed: Condvar,
 }
 
 impl Stdin {
     pub fn push(&self, c: char) {
         self.buf.lock().push_back(c);
-        self.pushed.notify_one();
     }
     pub fn pop(&self) -> char {
         loop {
             let ret = self.buf.lock().pop_front();
             match ret {
                 Some(c) => return c,
-                None => self.pushed._wait(),
+                None => processor().yield_now(),
             }
         }
     }

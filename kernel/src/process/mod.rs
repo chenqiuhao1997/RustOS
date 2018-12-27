@@ -4,7 +4,6 @@ pub use ucore_process::*;
 use consts::{MAX_CPU_NUM, MAX_PROCESS_NUM};
 use arch::cpu;
 use alloc::{boxed::Box, sync::Arc, vec::Vec};
-use sync::Condvar;
 use core::sync::atomic::*;
 
 pub mod context;
@@ -29,12 +28,6 @@ pub fn init() {
     ::shell::run_user_shell();
 
     
-    #[cfg(feature = "test_mutex_philosopher")]
-    ::thread::spawn(::sync::test::philosopher_using_mutex);
-
-    #[cfg(feature = "test_monitor_philosopher")]
-    ::thread::spawn(::sync::test::philosopher_using_monitor);
-
     info!("process init end");
 }
 
