@@ -109,10 +109,44 @@ python test.py
 
 * 完成kernel/trap.rs里面对于时钟中断的处理(timer函数). 
 
-
 ### Lab 2 物理内存管理
 
-主要任务是实现PageTable和InactivePageTable 以及内存的初始化
+#### 2.1 实验目的
+
+* 理解基于页式的内存地址转换机制
+* 理解页表的建立,使用和管理方法
+* 理解物理内存的管理方法
+
+#### 2.2 实验内容
+
+**练习1:**
+
+* 阅读crate/riscv中的内容,了解riscv32的页式地址转换机制和RustOS中为了修改页表项和实现的自映射机制
+
+**练习2:**
+
+* 实现基于线段树的bit-allocator
+
+**练习3:**
+
+* 完成kernel/arch/riscv32/memory.rs中的init函数,实现内存管理初始化.
+
+**练习4:**
+
+* 阅读crate/memory中的相关trait以及mock_page_table.rs中关于对于页表的一个假的实现
+* 完成kernel/arch/riscv32/paging.rs对于ActivePageTable的实现
+* 完成kernel/arch/riscv32/paging.rs中对于InactivePageTable0的实现
+
+#### 2.3 riscv32下的页式地址转换与自映射
+
+不同于x86, riscv32下如果二级页表项的属性是VRW,那么处理器就会认为这是一个指向4M大页的页表项,而不会去继续查找1级页表并最终找到对应的4K页. 因此RustOS中采用了特别地方式实现了针对二级页表的自映射.
+
+页表的特定目录项(RECURSIVE_INDEX)为自映射项, 其属性为VR,之后其下一项同样指向自身,属性为VRW.
+
+在进行自映射时先找到二级页表RECURSIVE_INDEX项再访问RECURSIVE_INDEX + 1即可完成自映射.
+
+
+ 
 
 ### Lab 3 虚拟内存管理
 
