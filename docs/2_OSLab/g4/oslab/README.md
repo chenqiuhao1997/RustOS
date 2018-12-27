@@ -145,9 +145,46 @@ python test.py
 
 在进行自映射时先找到二级页表RECURSIVE_INDEX项再访问RECURSIVE_INDEX + 1即可完成自映射.
 
-
- 
-
 ### Lab 3 虚拟内存管理
 
+ #### 3.1 实验目的
+
+* 了解虚存的概念与管理方式
+
+#### 3.2 实验内容
+
+**练习1:**
+
+* 完成crate/memory/src/swap/fifo.rs中对于可置换物理页管理的先进先出算法的代码实现.
+
+* 完成crate/memory/src/swap/mod.rs中对于SwapExt的实现,了解页面换入换出算法框架.
+* 完成crate/memory/src/cow.rs中对于CowExt的实现,了解CowOnWrite的算法框架.
+
+**练习2:**
+
+* 完成kernel/src/memory.rs 中对于内核地址空间进行管理的SimpleMemoryHandler的实现,了解虚拟内存管理的基本算法框架.
+
+**练习3:**
+
+* 完成kernel/src/arch/riscv32/memory.rs中对于remap_the_kernel函数,了解RustOS中对于用于内存管理的模块memory_set的工作原理.
+
+**challenge:**
+
+* 完成crate/memory/src/swap/enhanced_clock.rs中对于可置换物理页管理的时钟算法的代码实现.
+
 主要设计MemorySet相关内容的实现
+
+
+
+*在Lab4应该有一个练习是实现NormalMemoryHandler的*
+
+### Lab5 用户进程管理
+
+#### 5.1 实验目的
+
+#### 5.2 实验内容
+
+**challenge:**
+
+* 在kernel/src/arch/riscv32/memory.rs中完成具有全局页面置换和物理页帧延迟分配功能的SwapMemoryHandler,并在用户进程对应的用户地址空间(用户栈和用户代码数据段)应用上述MemoryHandler,并对比其与NormalMemoryHandler的区别
+* 在kernel/src/arch/riscv32/memory.rs中完成具有CopyOnWrite功能的CowMemoryHandler,并在用户进程对应的用户地址空间(用户栈和用户代码数据段)应用上述MemoryHandler,并对比其与NormalMemoryHandler的区别
