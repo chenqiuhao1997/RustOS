@@ -123,7 +123,7 @@ impl BitAlloc for BitAlloc16 {
 }
 
 #[inline(always)]
-#[cfg(target_arch = "riscv32")]
+//#[cfg(target_arch = "riscv32")]
 fn log2(x: u16) -> usize {
     log2_naive(x)
 }
