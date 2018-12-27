@@ -1,7 +1,6 @@
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use spin::Mutex;
-use scheduler::Scheduler;
 use core::cell::UnsafeCell;
 use alloc::vec::Vec;
 use event_hub::EventHub;
@@ -39,15 +38,15 @@ pub trait Context {
 
 pub struct ProcessManager {
     procs: Vec<Mutex<Option<Process>>>,
-    scheduler: Mutex<Box<Scheduler>>,
+    scheduler: Mutex<Vec<Pid>>,
     event_hub: Mutex<EventHub<Event>>,
 }
 
 impl ProcessManager {
-    pub fn new(scheduler: Box<Scheduler>, max_proc_num: usize) -> Self {
+    pub fn new(max_proc_num: usize) -> Self {
         ProcessManager {
             procs: new_vec_default(max_proc_num),
-            scheduler: Mutex::new(scheduler),
+            scheduler: Mutex::new(new_vec_default(0)),
             event_hub: Mutex::new(EventHub::new()),
         }
     }
@@ -88,9 +87,10 @@ impl ProcessManager {
             parent,
             children: Vec::new(),
         });
-        self.scheduler.lock().insert(pid);
+        self.scheduler.lock().insert(0, pid);
         self.procs[parent].lock().as_mut().expect("invalid parent proc")
             .children.push(pid);
+        debug!("add process {}", pid);
         pid
     }
 
@@ -105,12 +105,12 @@ impl ProcessManager {
                 Event::Wakeup(pid) => self.set_status(pid, Status::Ready),
             }
         }
-        self.scheduler.lock().tick(pid)
+        false
     }
 
     /// Set the priority of process `pid`
     pub fn set_priority(&self, pid: Pid, priority: u8) {
-        self.scheduler.lock().set_priority(pid, priority);
+
     }
 
     /// Called by Processor to get a process to run.
@@ -118,9 +118,7 @@ impl ProcessManager {
     /// then take out and return its Context.
     pub fn run(&self, cpu_id: usize) -> (Pid, Box<Context>) {
         let mut scheduler = self.scheduler.lock();
-        let pid = scheduler.select()
-            .expect("failed to select a runnable process");
-        scheduler.remove(pid);
+        let pid = scheduler.pop().unwrap();
         let mut proc_lock = self.procs[pid].lock();
         let mut proc = proc_lock.as_mut().expect("process not exist");
         proc.status = Status::Running(cpu_id);
@@ -136,7 +134,7 @@ impl ProcessManager {
         proc.status_after_stop = Status::Ready;
         proc.context = Some(context);
         match proc.status {
-            Status::Ready => self.scheduler.lock().insert(pid),
+            Status::Ready => self.scheduler.lock().insert(0, pid),
             Status::Exited(_) => self.exit_handler(pid, proc),
             _ => {}
         }
@@ -150,10 +148,10 @@ impl ProcessManager {
         trace!("process {} {:?} -> {:?}", pid, proc.status, status);
         match (&proc.status, &status) {
             (Status::Ready, Status::Ready) => return,
-            (Status::Ready, _) => self.scheduler.lock().remove(pid),
+            (Status::Ready, _) => self.scheduler.lock().retain(|&i| i != pid),
             (Status::Exited(_), _) => panic!("can not set status for a exited process"),
             (Status::Sleeping, Status::Exited(_)) => self.event_hub.lock().remove(Event::Wakeup(pid)),
-            (_, Status::Ready) => self.scheduler.lock().insert(pid),
+            (_, Status::Ready) => self.scheduler.lock().insert(0, pid),
             _ => {}
         }
         match proc.status {

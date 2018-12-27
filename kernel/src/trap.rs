@@ -22,5 +22,6 @@ pub fn error(tf: &TrapFrame) -> ! {
 }
 
 pub fn serial(c: char) {
+    info!("serial in {}", c);
     ::fs::STDIN.push(c);
 }

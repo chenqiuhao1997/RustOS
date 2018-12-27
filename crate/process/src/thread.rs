@@ -13,7 +13,6 @@ use core::ptr;
 use core::time::Duration;
 use processor::*;
 use process_manager::*;
-use scheduler::Scheduler;
 
 #[linkage = "weak"]
 #[no_mangle]

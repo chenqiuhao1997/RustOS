@@ -7,19 +7,10 @@ use process::*;
 
 
 pub fn run_user_shell() {
-    #[cfg(feature = "no_test")]
-    let inode = ROOT_INODE.lookup("sh").unwrap();
-
-    #[cfg(feature = "priority_test")]
-    let inode = ROOT_INODE.lookup("priority").unwrap();
-
+    let func = option_env!("TARGET_FUNC").unwrap();
+    let inode = ROOT_INODE.lookup(func).unwrap();
     let data = inode.read_as_vec().unwrap();
-
-    #[cfg(feature = "no_test")]
-    processor().manager().add(ContextImpl::new_user(data.as_slice(), "sh".split(' ')), 0);
-
-    #[cfg(feature = "priority_test")]
-    processor().manager().add(ContextImpl::new_user(data.as_slice(), "priority".split(' ')), 3);
+    processor().manager().add(ContextImpl::new_user(data.as_slice(), func.split(' ')), 0);
 }
 
 pub fn shell() {

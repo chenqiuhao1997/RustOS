@@ -9,8 +9,7 @@ use core::sync::atomic::*;
 pub mod context;
 pub fn init() {
     // NOTE: max_time_slice <= 5 to ensure 'priority' test pass
-    let scheduler = Box::new(scheduler::StrideScheduler::new(5));
-    let manager = Arc::new(ProcessManager::new(scheduler, MAX_PROCESS_NUM));
+    let manager = Arc::new(ProcessManager::new(MAX_PROCESS_NUM));
 
     unsafe {
         for cpu_id in 0..MAX_CPU_NUM {
@@ -26,7 +25,6 @@ pub fn init() {
     }
     ::shell::run_user_shell();
 
-    
     info!("process init end");
 }
 
