@@ -27,7 +27,6 @@ extern crate linked_list_allocator;
 extern crate log;
 #[macro_use]
 extern crate once;
-extern crate simple_filesystem; //just use for user program read
 extern crate spin;
 extern crate ucore_memory;
 extern crate ucore_process;
@@ -35,7 +34,6 @@ extern crate volatile;
 extern crate xmas_elf;
 
 pub use process::{processor, new_kernel_context};
-use ucore_process::thread;
 use linked_list_allocator::LockedHeap;
 
 #[macro_use]    // print!
@@ -49,7 +47,6 @@ mod syscall;
 mod fs;
 mod sync;
 mod trap;
-mod shell;
 
 
 #[cfg(target_arch = "riscv32")]

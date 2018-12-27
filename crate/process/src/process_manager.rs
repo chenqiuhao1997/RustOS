@@ -3,7 +3,6 @@ use alloc::sync::Arc;
 use spin::Mutex;
 use core::cell::UnsafeCell;
 use alloc::vec::Vec;
-use event_hub::EventHub;
 
 struct Process {
     id: Pid,
@@ -37,7 +36,6 @@ pub trait Context {
 pub struct ProcessManager {
     procs: Vec<Mutex<Option<Process>>>,
     scheduler: Mutex<Vec<Pid>>,
-    event_hub: Mutex<EventHub<Event>>,
 }
 
 impl ProcessManager {
@@ -45,7 +43,6 @@ impl ProcessManager {
         ProcessManager {
             procs: new_vec_default(max_proc_num),
             scheduler: Mutex::new(new_vec_default(0)),
-            event_hub: Mutex::new(EventHub::new()),
         }
     }
 
