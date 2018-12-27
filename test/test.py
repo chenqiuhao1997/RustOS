@@ -140,10 +140,9 @@ for testcase in checklist.keys():
 	os.kill(-qemu.pid, 9)
 	res = qemu.stdout.read()
 	start = res.find(testcase)
-	if start < 0 :
+	if start < 0 and target == '':
 		print("Error before go into shell")
 		sys.exit(2)
-	res = res[start:]
 	point = 1
 	for output in checklist[testcase]['rule']:
 		if res.find(output) < 0:
