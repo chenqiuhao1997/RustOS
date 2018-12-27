@@ -9,7 +9,7 @@ use core::sync::atomic::*;
 pub mod context;
 pub fn init() {
     // NOTE: max_time_slice <= 5 to ensure 'priority' test pass
-    let scheduler = Box::new(scheduler::RRScheduler::new(5));
+    let scheduler = Box::new(scheduler::StrideScheduler::new(5));
     let manager = Arc::new(ProcessManager::new(scheduler, MAX_PROCESS_NUM));
 
     unsafe {
@@ -24,7 +24,6 @@ pub fn init() {
     for i in 0..4 {
         manager.add(ContextImpl::new_kernel(idle, i), 0);
     }
-    #[cfg(feature = "no_test")]
     ::shell::run_user_shell();
 
     

@@ -99,6 +99,22 @@ checklist = {
 		"All done in process 5.",
 		"yield pass.",
 	]},
+	'priority':{'time':45, 'target': 'priority_test', 'rule': [
+		"priority process will sleep 400 ticks",
+		"main: fork ok,now need to wait pids.",
+		"child pid 9, acc 15028000, time 1401",
+		"child pid 7, acc 9296000, time 1401",
+		"child pid 8, acc 12104000, time 1401",
+		"child pid 6, acc 6272000, time 1401",
+		"child pid 5, acc 3204000, time 1401",
+		"main: pid 5, acc 3204000, time 1401",
+		"main: pid 6, acc 6272000, time 1401",
+		"main: pid 7, acc 9296000, time 1401",
+		"main: pid 8, acc 12104000, time 1401",
+		"main: pid 9, acc 15028000, time 1401",
+		"main: wait pids over",
+		"stride sched correct result: 1 2 3 4 5",
+	]},
 }
 
 unit_test = ['/crate/process', '/crate/memory']
@@ -116,7 +132,10 @@ for unit_test_path in unit_test:
 
 os.system(realpath+'/clean_and_make.sh')
 for testcase in checklist.keys():
-	qemu = subprocess.Popen(realpath+'/make_and_run.sh', shell=True, \
+	target = ''
+	if checklist[testcase].has_key('target'):
+		target = ' ' + checklist[testcase]['target']
+	qemu = subprocess.Popen(realpath+'/make_and_run.sh'+target, shell=True, \
 		stdin=subprocess.PIPE, \
 		stdout=subprocess.PIPE, \
 		stderr = subprocess.PIPE,\

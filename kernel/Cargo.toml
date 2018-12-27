@@ -7,8 +7,7 @@ authors = ["Runji Wang <wangrunji0408@163.com>"]
 link_user_program = []
 no_bbl = []
 no_test = []
-test_mutex_philosopher = []
-test_monitor_philosopher = []
+priority_test = []
 
 
 [profile.dev]
