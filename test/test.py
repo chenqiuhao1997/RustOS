@@ -88,7 +88,17 @@ checklist = {
 	]},
 	'sleepkill':{'time':5, 'rule':[
 		'sleepkill pass.',
-	]}
+	]},
+	'yield':{'time':5, 'rule': [
+		"Hello, I am process 5.",
+		"Back in process 5, iteration 0.",
+		"Back in process 5, iteration 1.",
+		"Back in process 5, iteration 2.",
+		"Back in process 5, iteration 3.",
+		"Back in process 5, iteration 4.",
+		"All done in process 5.",
+		"yield pass.",
+	]},
 }
 philosopher_num = 5
 ph_iter_num = 5
