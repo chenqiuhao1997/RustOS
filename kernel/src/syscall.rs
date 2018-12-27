@@ -9,6 +9,8 @@ use alloc::sync::Arc;
 use spin::Mutex;
 use alloc::vec::Vec;
 use alloc::string::String;
+use fs::{STDIN, STDOUT};
+use simple_filesystem::INode;
 
 /// System call dispatcher
 pub fn syscall(id: usize, args: [usize; 6], tf: &mut TrapFrame) -> i32 {
@@ -57,13 +59,15 @@ pub fn syscall(id: usize, args: [usize; 6], tf: &mut TrapFrame) -> i32 {
 }
 
 fn sys_read(fd: usize, base: *mut u8, len: usize) -> SysResult {
-    info!("sys_read");
-    unimplemented!()
+    info!("read: fd: {}, base: {:?}, len: {:#x}", fd, base, len);
+    let slice = unsafe { slice::from_raw_parts_mut(base, len) };
+    Ok(STDIN.read_at(0, slice)? as i32)
 }
 
 fn sys_write(fd: usize, base: *const u8, len: usize) -> SysResult {
-    info!("sys_write");
-    unimplemented!()
+    info!("write: fd: {}, base: {:?}, len: {:#x}", fd, base, len);
+    let slice = unsafe { slice::from_raw_parts(base, len) };
+    Ok(STDOUT.write_at(0, slice)? as i32)
 }
 
 fn sys_open(path: *const u8, flags: usize) -> SysResult {

@@ -5,6 +5,13 @@ use alloc::vec::Vec;
 use fs::{ROOT_INODE, INodeExt};
 use process::*;
 
+
+pub fn run_user_shell() {
+    let inode = ROOT_INODE.lookup("sh").unwrap();
+    let data = inode.read_as_vec().unwrap();
+    processor().manager().add(ContextImpl::new_user(data.as_slice(), "sh".split(' ')), 0);
+}
+
 pub fn shell() {
     let files = ROOT_INODE.list().unwrap();
     println!("Available programs: {:?}", files);
