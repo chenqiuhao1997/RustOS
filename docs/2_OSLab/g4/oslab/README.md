@@ -172,19 +172,68 @@ python test.py
 
 * 完成crate/memory/src/swap/enhanced_clock.rs中对于可置换物理页管理的时钟算法的代码实现.
 
-主要设计MemorySet相关内容的实现
+### Lab4 内核线程管理
+#### 4.1 实验目的
+* 了解内核线程创建/执行的管理过程
+* 了解内核线程的切换和基本调度过程
 
+#### 4.2 实验内容
+**练习1:**
+* 完成kernel/src/memory.rs中对于用户地址空间进行管理的MemoryHandler的极简实现。
+ 
+*应该包括为进程分配资源的联系和switch相关内容的联系，视最终版本而定*
 
-
-*在Lab4应该有一个练习是实现NormalMemoryHandler的*
 
 ### Lab5 用户进程管理
 
 #### 5.1 实验目的
+* 了解第一个用户进程创建过程
+* 了解系统调用框架的实现机制
+* 了解ucore如何实现系统调用sys_fork/sys_exec/sys_exit/sys_wait来进行进程管理
 
 #### 5.2 实验内容
+**练习1:**
+
+* 完成kernel/src/process/context.rs中newuser中的相关内容
 
 **challenge:**
 
 * 在kernel/src/arch/riscv32/memory.rs中完成具有全局页面置换和物理页帧延迟分配功能的SwapMemoryHandler,并在用户进程对应的用户地址空间(用户栈和用户代码数据段)应用上述MemoryHandler,并对比其与NormalMemoryHandler的区别
 * 在kernel/src/arch/riscv32/memory.rs中完成具有CopyOnWrite功能的CowMemoryHandler,并在用户进程对应的用户地址空间(用户栈和用户代码数据段)应用上述MemoryHandler,并对比其与NormalMemoryHandler的区别
+
+### Lab6 调度器
+
+#### 6.1 实验目的
+* 理解操作系统的调度管理机制
+* 熟悉 RustOS 的系统调度器框架，以及缺省的Round-Robin 调度算法
+* 基于调度器框架实现一个(Stride Scheduling)调度算法来替换缺省的调度算法
+
+#### 6.2 实验内容
+**练习1:**
+* 熟悉在crate/process/src/scheduler.rs中的RRScheduler的算法实现
+
+**练习2:**
+* 在crate/process/src/scheduler.rs中实现 Stride Scheduling 调度算法
+
+### Lab7 同步互斥
+
+#### 7.1 实验目的
+* 理解操作系统的同步互斥的设计实现；
+* 理解底层支撑技术：禁用中断、定时器、等待队列；
+* 在ucore中理解信号量（semaphore）机制的具体实现；
+* 理解管程机制，在ucore内核中增加基于管程（monitor）的条件变量（condition variable）的支持；
+* 了解经典进程同步问题，并能使用同步机制解决进程同步问题。
+
+#### 7.2 实验内容
+**练习1:**
+* 在kernel/src/sync/semaphore.rs中实现基于中断禁止互斥锁和条件变量的信号量
+
+**练习2:**
+* 在kernel/src/sync/test.rs中实现基于互斥锁和信号量的管程
+* 在kernel/src/sync/test.rs中分别实现基于互斥锁和管程的哲学家就餐问题
+
+### Lab8 文件系统
+
+#### 8.1 实验目的
+
+#### 8.2 实验内容
