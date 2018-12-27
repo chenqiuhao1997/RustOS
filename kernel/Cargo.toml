@@ -29,8 +29,6 @@ lazy_static = { version = "1.2", features = ["spin_no_std"] }
 bit-allocator = { path = "../crate/bit-allocator" }
 ucore-memory = { path = "../crate/memory" }
 ucore-process = { path = "../crate/process" }
-simple-filesystem = { git = "https://github.com/wangrunji0408/SimpleFileSystem-Rust", branch = "multi-thread" } #just use for user program read
-
 
 [target.'cfg(target_arch = "riscv32")'.dependencies]
 riscv = { git = "https://github.com/riscv-and-rust-and-decaf/riscv" }

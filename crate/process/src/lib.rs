@@ -19,8 +19,6 @@ extern crate std;
 
 mod process_manager;
 mod processor;
-pub mod thread;
-mod event_hub;
 mod interrupt;
 
 pub use process_manager::*;

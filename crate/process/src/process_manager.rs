@@ -10,8 +10,6 @@ struct Process {
     status: Status,
     status_after_stop: Status,
     context: Option<Box<Context>>,
-    parent: Pid,
-    children: Vec<Pid>,
 }
 
 pub type Pid = usize;
@@ -58,20 +56,6 @@ impl ProcessManager {
                 return i;
             }
             let proc = proc_lock.as_ref().expect("process not exist");
-
-            match proc.status {
-                Status::Exited(_) => {
-                    if proc.parent == 0 {
-                        for child in proc.children.iter() {
-                            (&self.procs[*child]).lock().as_mut().expect("process not exist").parent = 0;
-                        }
-                        *proc_lock = None;
-                    }
-                }
-                _ => {
-                    continue;
-                }
-            }
         }
         panic!("Process number exceeded");
     }
@@ -84,14 +68,8 @@ impl ProcessManager {
             status: Status::Ready,
             status_after_stop: Status::Ready,
             context: Some(context),
-            parent,
-            children: Vec::new(),
         });
         self.scheduler.lock().insert(0, pid);
-        if pid != 0 {
-            self.procs[parent].lock().as_mut().expect("invalid parent proc")
-                .children.push(pid);
-        }
         debug!("add process {}", pid);
         pid
     }
@@ -100,13 +78,6 @@ impl ProcessManager {
     /// Return true if time slice == 0.
     /// Called by timer interrupt handler.
     pub fn tick(&self, pid: Pid) -> bool {
-        let mut event_hub = self.event_hub.lock();
-        event_hub.tick();
-        while let Some(event) = event_hub.pop() {
-            match event {
-                Event::Wakeup(pid) => self.set_status(pid, Status::Ready),
-            }
-        }
         false
     }
 
@@ -145,88 +116,48 @@ impl ProcessManager {
     /// Switch the status of a process.
     /// Insert/Remove it to/from scheduler if necessary.
     fn set_status(&self, pid: Pid, status: Status) {
-        let mut proc_lock = self.procs[pid].lock();
-        let mut proc = proc_lock.as_mut().expect("process not exist");
-        trace!("process {} {:?} -> {:?}", pid, proc.status, status);
-        match (&proc.status, &status) {
-            (Status::Ready, Status::Ready) => return,
-            (Status::Ready, _) => self.scheduler.lock().retain(|&i| i != pid),
-            (Status::Exited(_), _) => panic!("can not set status for a exited process"),
-            (Status::Sleeping, Status::Exited(_)) => self.event_hub.lock().remove(Event::Wakeup(pid)),
-            (_, Status::Ready) => self.scheduler.lock().insert(0, pid),
-            _ => {}
-        }
-        match proc.status {
-            Status::Running(_) => proc.status_after_stop = status,
-            _ => proc.status = status,
-        }
-        match proc.status {
-            Status::Exited(_) => self.exit_handler(pid, proc),
-            _ => {}
-        }
+        unimplemented!()
     }
 
     pub fn get_status(&self, pid: Pid) -> Option<Status> {
-        self.procs[pid].lock().as_ref().map(|p| p.status.clone())
+        unimplemented!()
     }
 
     /// Remove an exited proc `pid`.
     /// Its all children will be set parent to 0.
     pub fn remove(&self, pid: Pid) {
-        let mut proc_lock = self.procs[pid].lock();
-        let proc = proc_lock.as_ref().expect("process not exist");
-        match proc.status {
-            Status::Exited(_) => {}
-            _ => panic!("can not remove non-exited process"),
-        }
-        // orphan procs
-        for child in proc.children.iter() {
-            (&self.procs[*child]).lock().as_mut().expect("process not exist").parent = 0;
-        }
-        // remove self from parent's children list
-        self.procs[proc.parent].lock().as_mut().expect("process not exist")
-            .children.retain(|&i| i != pid);
-        // release the pid
-        *proc_lock = None;
+        unimplemented!()
     }
 
     /// Sleep `pid` for `time` ticks.
     /// `time` == 0 means sleep forever
     pub fn sleep(&self, pid: Pid, time: usize) {
-        self.set_status(pid, Status::Sleeping);
-        if time != 0 {
-            self.event_hub.lock().push(time, Event::Wakeup(pid));
-        }
+        unimplemented!()
     }
 
     pub fn wakeup(&self, pid: Pid) {
-        self.set_status(pid, Status::Ready);
+        unimplemented!()
     }
 
     pub fn wait(&self, pid: Pid, target: Pid) {
-        self.set_status(pid, Status::Waiting(target));
+        unimplemented!()
     }
     pub fn wait_child(&self, pid: Pid) {
-        self.set_status(pid, Status::Waiting(0));
+        unimplemented!()
     }
 
     pub fn get_children(&self, pid: Pid) -> Vec<Pid> {
-        self.procs[pid].lock().as_ref().expect("process not exist").children.clone()
+        unimplemented!()
     }
 
     pub fn exit(&self, pid: Pid, code: ExitCode) {
-        // NOTE: if `pid` is running, status change will be deferred.
-        self.set_status(pid, Status::Exited(code));
+        let mut proc_lock = self.procs[pid].lock();
+        let mut proc = proc_lock.as_mut().expect("process not exist");
+        proc.status = Status::Exited(code);
+        self.exit_handler(pid, proc)
     }
     /// Called when a process exit
     fn exit_handler(&self, pid: Pid, proc: &mut Process) {
-        // wakeup parent if waiting
-        let parent = proc.parent;
-        match self.get_status(parent).expect("process not exist") {
-            Status::Waiting(target) if target == pid || target == 0 => self.wakeup(parent),
-            _ => {}
-        }
-        // drop its context
         proc.context = None;
     }
 }
