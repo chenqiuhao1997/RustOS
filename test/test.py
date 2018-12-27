@@ -104,7 +104,7 @@ philosopher_num = 5
 ph_iter_num = 5
 philosopher_methods = ['mutex', 'monitor']
 
-unit_test = ['/crate/process', '/crate/memory']
+unit_test = ['/crate/process', '/crate/memory', '/crate/bit-allocator']
 
 realpath = sys.path[0]
 os.system(realpath+'/clean_and_make.sh')
