@@ -15,7 +15,8 @@
 #   LOG  = off | error | warn | info | debug | trace
 #   smp                         SMP core number
 #   board 						Only available on riscv32, build without bbl, run on board
-#   test_target = no_test | ... choose target to test       
+#   test_target = no_test | ... choose target to test  
+#   target_func = sh | ...      choose func to start     
 
 arch ?= riscv32
 mode ?= debug
@@ -55,6 +56,7 @@ ifdef d
 qemu_opts := $(qemu_opts) -d $(d)
 endif
 
+export TARGET_FUNC=$(target_func)
 features := $(features) $(test_target)
 
 build_args := --target $(target).json --features "$(features)"
