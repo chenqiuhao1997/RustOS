@@ -127,7 +127,6 @@ for testcase in checklist.keys():
 		)
 
 	time.sleep(5)
-	qemu.stdin.write(testcase+'\n')
 
 	time.sleep(checklist[testcase]['time'])
 	os.kill(-qemu.pid, 9)
