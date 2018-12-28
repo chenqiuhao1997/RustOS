@@ -185,7 +185,7 @@ RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(�
 
 #### 4.2 实验内容
 **练习1:**
-* 完成kernel/src/memory.rs中对于用户地址空间进行管理的MemoryHandler的极简实现。
+* 完成kernel/src/memory.rs中对于用户地址空间进行管理的MemoryHandler的极简实现(SimpleMemoryHandler)
 
 *应该包括为进程分配资源的联系和switch相关内容的联系，视最终版本而定*
 
@@ -195,7 +195,7 @@ RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(�
 #### 5.1 实验目的
 * 了解第一个用户进程创建过程
 * 了解系统调用框架的实现机制
-* 了解ucore如何实现系统调用sys_fork/sys_exec/sys_exit/sys_wait来进行进程管理
+* 了解Rust OS lab如何实现系统调用sys_fork/sys_exec/sys_exit/sys_wait来进行进程管理
 
 #### 5.2 实验内容
 **练习1:**
@@ -224,10 +224,9 @@ RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(�
 ### Lab7 同步互斥
 
 #### 7.1 实验目的
-* 理解操作系统的同步互斥的设计实现；
-* 理解底层支撑技术：禁用中断、定时器、等待队列；
-* 在ucore中理解信号量（semaphore）机制的具体实现；
-* 理解管程机制，在ucore内核中增加基于管程（monitor）的条件变量（condition variable）的支持；
+* 理解操作系统的同步互斥的设计实现
+* 理解底层支撑技术：禁用中断、定时器、等待队列
+* 理解信号量（semaphore）和管程(monitor)机制的具体原理并加以实现
 * 了解经典进程同步问题，并能使用同步机制解决进程同步问题。
 
 #### 7.2 实验内容
