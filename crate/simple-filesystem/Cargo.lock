@@ -1,0 +1,28 @@
+[[package]]
+name = "bit-vec"
+version = "0.5.0"
+source = "git+https://github.com/AltSysrq/bit-vec.git#9861a58d6e761906cc63964c759e71f05bf63540"
+
+[[package]]
+name = "simple-filesystem"
+version = "0.0.1"
+dependencies = [
+ "bit-vec 0.5.0 (git+https://github.com/AltSysrq/bit-vec.git)",
+ "spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "static_assertions 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "spin"
+version = "0.4.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "static_assertions"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[metadata]
+"checksum bit-vec 0.5.0 (git+https://github.com/AltSysrq/bit-vec.git)" = "<none>"
+"checksum spin 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ceac490aa12c567115b40b7b7fceca03a6c9d53d5defea066123debc83c5dc1f"
+"checksum static_assertions 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "389ce475f424f267dbed6479cbd8f126c5e1afb053b0acdaa019c74305fc65d1"

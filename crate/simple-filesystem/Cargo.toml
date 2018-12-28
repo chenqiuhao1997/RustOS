@@ -17,3 +17,6 @@ spin = "0.4"
 [features]
 debug_print = []
 std = []
+
+[lib]
+doctest = false

@@ -95,7 +95,7 @@ fn resize() -> Result<()> {
 //    sfs.sync().unwrap();
 //}
 
-#[test]
+//#[test]
 fn create_then_lookup() -> Result<()> {
     let sfs = _create_new_sfs();
     let root = sfs.root_inode();
@@ -193,7 +193,7 @@ fn kernel_image_file_move() -> Result<()> {
     Ok(())
 }
 
-#[test]
+//#[test]
 fn hard_link() -> Result<()> {
     let sfs = _create_new_sfs();
     let root = sfs.root_inode();
