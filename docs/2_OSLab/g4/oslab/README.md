@@ -186,8 +186,8 @@ RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(�
 #### 4.2 实验内容
 **练习1:**
 * 完成kernel/src/memory.rs中对于用户地址空间进行管理的MemoryHandler的极简实现。
-
-*应该包括为进程分配资源的联系和switch相关内容的联系，视最终版本而定*
+* 完成crate/process/process_manager.rs中对于进程状态的初步管理的实现。
+* 阅读并完善crate/process/processor.rs中对于进程管理模块的框架。
 
 
 ### Lab5 用户进程管理
@@ -201,6 +201,9 @@ RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(�
 **练习1:**
 
 * 完成kernel/src/process/context.rs中newuser中的相关内容
+* 完成crate/process/process_manager.rs中对于进程状态管理的完整实现
+* 完成crate/process/event_hub.rs中对于sleep状态维护的数据结构的实现
+* 阅读并完善crate/process/thread.rs中对于内核线程接口的实现
 
 **challenge:**
 
