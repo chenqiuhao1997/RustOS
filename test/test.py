@@ -116,7 +116,7 @@ for unit_test_path in unit_test:
 
 
 for testcase in checklist.keys():
-	target = testcase
+	target = ' ' + testcase
 	if checklist[testcase].has_key('target'):
 		target = ' ' + checklist[testcase]['target']
 	os.system(realpath+'/clean_and_make.sh'+target)
