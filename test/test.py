@@ -1,7 +1,6 @@
 import os, sys, time, subprocess, signal
 
 checklist = {
-	'waitkill':{'time':15, 'rule':['wait child 1.', 'child 1.', 'child 2.', 'kill parent ok.', 'error: 256 - error 256', 'kill child1 ok.']},
 	'sleep':{'time':45, 'rule':[
 		'sleep pass.',
 		'sleep 1 x 100 slices.',
