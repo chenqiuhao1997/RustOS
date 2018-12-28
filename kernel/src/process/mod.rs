@@ -16,11 +16,10 @@ pub fn init() {
             PROCESSORS[cpu_id].init(cpu_id, ContextImpl::new_init(), manager.clone());
         }
     }
-
     extern fn idle(_arg: usize) -> ! {
-        loop { cpu::halt(); }
+        loop { cpu::halt(); processor().yield_now();}
     }
-
+    manager.add(ContextImpl::new_kernel(idle, 0), 0);
     
     ::shell::run_user_shell();
 

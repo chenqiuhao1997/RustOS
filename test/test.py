@@ -104,7 +104,7 @@ checklist = {
 unit_test = ['/crate/process', '/crate/memory']
 
 realpath = sys.path[0]
-os.system(realpath+'/clean_and_make.sh')
+os.system(realpath+'/clean_and_make.sh 2> /dev/null > /dev/null' )
 
 
 for unit_test_path in unit_test:
@@ -119,7 +119,7 @@ for testcase in checklist.keys():
 	target = ' ' + testcase
 	if checklist[testcase].has_key('target'):
 		target = ' ' + checklist[testcase]['target']
-	os.system(realpath+'/clean_and_make.sh'+target)
+	os.system(realpath+'/clean_and_make.sh'+target + ' 2> /dev/null > /dev/null')
 	qemu = subprocess.Popen(realpath+'/make_and_run.sh'+target, shell=True, \
 		stdin=subprocess.PIPE, \
 		stdout=subprocess.PIPE, \
