@@ -148,9 +148,12 @@ impl ProcessManager {
     }
 
     pub fn exit(&self, pid: Pid, code: ExitCode) {
+        debug!("{} exit", pid);
         let mut proc_lock = self.procs[pid].lock();
         let mut proc = proc_lock.as_mut().expect("process not exist");
         proc.status = Status::Exited(code);
+        self.scheduler.lock().retain(|&i| i != pid);
+        proc.status_after_stop = Status::Exited(code);
         self.exit_handler(pid, proc)
     }
     /// Called when a process exit
@@ -158,6 +161,7 @@ impl ProcessManager {
         proc.context = None;
     }
 }
+
 
 fn new_vec_default<T: Default>(size: usize) -> Vec<T> {
     let mut vec = Vec::new();

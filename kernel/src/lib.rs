@@ -11,6 +11,7 @@
 #![feature(compiler_builtins_lib)]
 #![feature(raw)]
 #![feature(vec_resize_default)]
+#![feature(never_type)]
 #![no_std]
 
 
