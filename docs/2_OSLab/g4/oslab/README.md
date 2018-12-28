@@ -242,6 +242,18 @@ RustOS lab中涉及虚拟地址map, unmap, page_fault处理和MemorySet复制(�
 
 #### 8.1 实验目的
 
-
+* 了解基本的文件系统系统调用的实现方法
+* 了解一个基于索引节点组织方式的Simple FS文件系统的设计与实现
+* 了解文件系统抽象层-VFS的设计与实现
 
 #### 8.2 实验内容
+
+**练习1:**
+
+* 在kernel/src/fs.rs中为INode实现INodeExt接口,使其能够实现以Vec形式读取INode中的文件内容
+
+* 在kernel/src/shell.rs中实现run_user_shell函数,使得OS能够正确读取sh的代码文件并作为用户程序执行
+
+**练习2:**
+
+* 在crate/simple-filesystem/src/sfs.rs中实现link和ulink操作
